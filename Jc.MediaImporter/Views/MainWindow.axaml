@@ -1,0 +1,64 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Jc.MediaImporter.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        Width="900" Height="600"
+        x:Class="Jc.MediaImporter.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Jc.MediaImporter">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <Border Padding="10">
+        <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+            <TextBox Grid.Row="0"
+                     x:Name="SourceDirectory"
+                     CornerRadius="3"
+                     Watermark="Select the source directory"
+                     Text="{Binding SourceDirectory, Mode=TwoWay}">
+                <TextBox.InnerRightContent>
+                    <Button Grid.Row="1" i:Attached.Icon="mdi-folder-open-outline" Classes="icon_button" Width="30"
+                            Height="30" Click="SourceButton_OnClick" />
+                </TextBox.InnerRightContent>
+            </TextBox>
+            <Button Grid.Row="1" IsVisible="{Binding !IsLoading}" Content="Load" Margin="0,10,0,10"
+                    Command="{Binding LoadMediaCommand}" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center">
+            </Button>
+            <i:Icon Grid.Row="1" Value="mdi-loading" Animation="Spin" IsVisible="{Binding IsLoading}"
+                    Margin="0, 10, 0, 10" FontSize="24" />
+            <DataGrid Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      ItemsSource="{Binding MediaFiles}"
+                      AutoGenerateColumns="True" IsReadOnly="True"
+                      GridLinesVisibility="All"
+                      BorderThickness="1" BorderBrush="Gray">
+            </DataGrid>
+            <TextBox Grid.Row="3"
+                     x:Name="TargetDirectory"
+                     CornerRadius="3"
+                     Watermark="Select the target root directory"
+                     Text="{Binding TargetDirectory, Mode=TwoWay}"
+                     Margin="0, 10, 0, 0">
+                <TextBox.InnerRightContent>
+                    <Button Grid.Row="1" i:Attached.Icon="mdi-folder-open-outline" Classes="icon_button" Width="30"
+                            Height="30" Click="TargetButton_OnClick" />
+                </TextBox.InnerRightContent>
+            </TextBox>
+            <Button Grid.Row="4" IsVisible="{Binding !IsImporting}" Content="Import" Margin="0,10,0,10"
+                    Command="{Binding ImportMediaCommand}" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center">
+            </Button>
+            <i:Icon Grid.Row="4" Value="mdi-loading" Animation="Spin" IsVisible="{Binding IsImporting}"
+                    Margin="0, 10, 0, 10" FontSize="24" />
+        </Grid>
+    </Border>
+
+</Window>
