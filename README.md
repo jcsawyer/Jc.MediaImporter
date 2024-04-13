@@ -6,6 +6,8 @@ A simple GUI application that allows me to conveniently import media (photos/vid
 
 ## About
 
+You can find some more information on [my blog post](https://jcsawyer.com/blog/2024/04/13/modernizing-my-media-importer/).
+
 A while back after starting my family, it became quickly apparent there was no real convenient way to manage photos and videos captured across all our devices and put them on server in the correct shape without requiring a week to go through everything.
 
 I created an initial version in .NET Core Windows Forms but this no longer works now I'm daily driving a Mac. So `Jc.MediaImporter` was born.
