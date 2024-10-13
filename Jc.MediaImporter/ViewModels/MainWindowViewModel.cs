@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Threading;
-using DynamicData.Binding;
 using Jc.MediaImporter.Core;
 using ReactiveUI;
 
@@ -17,7 +16,7 @@ public class MainWindowViewModel : ViewModelBase
 {
     private static readonly string PhotoTarget = "Photos";
     private static readonly string VideoTarget = Path.Combine("Home Videos", "Captured");
-    
+
     public MainWindowViewModel()
     {
         LoadMediaCommand = ReactiveCommand.Create(LoadMedia);
@@ -59,6 +58,22 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _targetDirectory, value);
     }
 
+    private int _importProgress;
+
+    public int ImportProgress
+    {
+        get => _importProgress;
+        set => this.RaiseAndSetIfChanged(ref _importProgress, value);
+    }
+
+    private int _importProgressTotal;
+
+    public int ImportProgressTotal
+    {
+        get => _importProgressTotal;
+        set => this.RaiseAndSetIfChanged(ref _importProgressTotal, value);
+    }
+
     public ObservableCollection<MediaFile> MediaFiles { get; } = new ObservableCollection<MediaFile>();
 
     private void ImportMedia()
@@ -69,7 +84,7 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         IsImporting = true;
-        
+
         // Run on another thread so we're not blocking
         Task.Run(ImportMediaImpl);
     }
@@ -91,80 +106,91 @@ public class MainWindowViewModel : ViewModelBase
             .GroupBy(f => $"{f.Date.Year}-{f.Date.Month:00}");
         seedDirectories(Path.Combine(TargetDirectory, VideoTarget), groupedVideos);
 
-        var grouped = MediaFiles.GroupBy(f => $"{f.Date.Year}-{f.Date.Month:00}");
-        
+        var grouped = MediaFiles.GroupBy(f => $"{f.Date.Year}-{f.Date.Month:00}").ToList();
+
         var totalItems = grouped.Sum(g => g.Count());
-            var processedItems = 0;
-            var progress = 0;
+        ImportProgress = 0;
+        var processedItems = 0;
+        var progress = 0;
 
-            void ItemProcessed()
+        void ItemProcessed()
+        {
+            processedItems++;
+            progress = (int)Math.Ceiling((float)processedItems / totalItems * 100);
+            //worker!.ReportProgress(progress);
+            Dispatcher.UIThread.Post(() =>
             {
-                processedItems++;
-                progress = (int)Math.Ceiling((float)processedItems / totalItems * 100);
-                //worker!.ReportProgress(progress);
-            }
+                ImportProgress = processedItems;
+            });
+        }
 
-            // TODO we also need to group by media type
-            foreach (var group in grouped)
+        // TODO we also need to group by media type
+        foreach (var group in grouped)
+        {
+            foreach (var file in group)
             {
-                foreach (var file in group)
+                var targetPath = file.Type switch
                 {
-                    var targetPath = file.Type switch
-                    {
-                        MediaType.Photo => Path.Combine(TargetDirectory, PhotoTarget),
-                        MediaType.Video => Path.Combine(TargetDirectory, VideoTarget),
-                        _ => string.Empty
-                    };
-                    if (string.IsNullOrEmpty(targetPath))
-                    {
-                        processedItems++;
-                        continue;
-                    }
+                    MediaType.Photo => Path.Combine(TargetDirectory, PhotoTarget),
+                    MediaType.Video => Path.Combine(TargetDirectory, VideoTarget),
+                    _ => string.Empty
+                };
+                if (string.IsNullOrEmpty(targetPath))
+                {
+                    ItemProcessed();
+                    continue;
+                }
 
-                    /*if (file.Type == MediaType.Video && file.Duration < TimeSpan.FromSeconds(10))
-                    {
-                        // Try to avoid moving live photo snippets
-                        ItemProcessed();
-                        continue;
-                    }*/
+                /*if (file.Type == MediaType.Video && file.Duration < TimeSpan.FromSeconds(10))
+                {
+                    // Try to avoid moving live photo snippets
+                    ItemProcessed();
+                    continue;
+                }*/
 
+                try
+                {
+                    File.Move(file.Path, Path.Combine(targetPath, group.Key, $"{file.SortedName}{file.Extension}"));
+                }
+                catch (IOException eex) when (eex.Message == "Cannot create a file when that file already exists.")
+                {
+                    var duplicates = Directory.GetFiles(Path.Combine(targetPath, group.Key), $"{file.SortedName}*");
                     try
                     {
-                        File.Move(file.Path, Path.Combine(targetPath, group.Key, $"{file.SortedName}{file.Extension}"));
+                        File.Move(file.Path,
+                            Path.Combine(targetPath, group.Key,
+                                $"{file.SortedName}_{duplicates.Count()}{file.Extension}"));
                     }
-                    catch (IOException eex) when (eex.Message == "Cannot create a file when that file already exists.")
+                    catch (IOException)
                     {
-                        var duplicates = Directory.GetFiles(Path.Combine(targetPath, group.Key), $"{file.SortedName}*");
-                        try
-                        {
-                            File.Move(file.Path, Path.Combine(targetPath, group.Key, $"{file.SortedName}_{duplicates.Count()}{file.Extension}"));
-                        }
-                        catch (IOException) { }
-                    }
-                    catch (IOException ex)
-                    {
-                        Console.WriteLine(ex);
-                        // TODO handle file existing already?
-                    }
-                    finally
-                    {
-                        var dir = Path.GetDirectoryName(file.Path);
-                        if (!Directory.EnumerateFiles(dir!, "*.*", SearchOption.AllDirectories).Where(f => !f.EndsWith("Thumbs.db", StringComparison.OrdinalIgnoreCase)).Any())
-                        {
-                            Directory.Delete(dir!, true);
-                        }
-                        ItemProcessed();
                     }
                 }
+                catch (IOException ex)
+                {
+                    Console.WriteLine(ex);
+                    // TODO handle file existing already?
+                }
+                finally
+                {
+                    var dir = Path.GetDirectoryName(file.Path);
+                    if (Directory.EnumerateFiles(dir!, "*.*", SearchOption.AllDirectories)
+                        .All(f => f.EndsWith("Thumbs.db", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        Directory.Delete(dir!, true);
+                    }
+
+                    ItemProcessed();
+                }
             }
-        
+        }
+
         Dispatcher.UIThread.Post(() =>
         {
             MediaFiles.Clear();
             IsImporting = false;
         });
     }
-    
+
     private void LoadMedia()
     {
         if (string.IsNullOrWhiteSpace(SourceDirectory) || IsImporting)
@@ -174,11 +200,11 @@ public class MainWindowViewModel : ViewModelBase
 
         IsLoading = true;
         MediaFiles.Clear();
-        
+
         // Run on another thread so we're not blocking
         Task.Run(LoadMediaImpl);
     }
-    
+
     private void LoadMediaImpl()
     {
         var paths = new[] { SourceDirectory }.ToList();
@@ -218,7 +244,8 @@ public class MainWindowViewModel : ViewModelBase
                     progress = (int)Math.Ceiling((float)processedItems / totalItems * 100);
                     //worker!.ReportProgress(progress, GetMetaData(file));
                     var item = GetMetaData(file);
-                    if (item.HasValue && !string.IsNullOrWhiteSpace(item.Value.Path) && item.Value.Directories is not null)
+                    if (item.HasValue && !string.IsNullOrWhiteSpace(item.Value.Path) &&
+                        item.Value.Directories is not null)
                     {
                         Dispatcher.UIThread.Post(() =>
                         {
@@ -243,9 +270,11 @@ public class MainWindowViewModel : ViewModelBase
             }
         }
 
+
         Dispatcher.UIThread.Post(() =>
         {
             IsLoading = false;
+            ImportProgressTotal = totalItems;
         });
     }
 }
