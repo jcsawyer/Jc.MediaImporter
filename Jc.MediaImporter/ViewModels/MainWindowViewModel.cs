@@ -74,7 +74,7 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _importProgressTotal, value);
     }
 
-    public ObservableCollection<MediaFile> MediaFiles { get; } = new ObservableCollection<MediaFile>();
+    public ObservableCollection<MediaFileViewModel> MediaFiles { get; } = new ObservableCollection<MediaFileViewModel>();
 
     private void ImportMedia()
     {
@@ -91,7 +91,7 @@ public class MainWindowViewModel : ViewModelBase
 
     private void ImportMediaImpl()
     {
-        void seedDirectories(string root, IEnumerable<IGrouping<string, MediaFile>> groupedFiles)
+        void seedDirectories(string root, IEnumerable<IGrouping<string, MediaFileViewModel>> groupedFiles)
         {
             foreach (var group in groupedFiles)
             {
@@ -249,7 +249,9 @@ public class MainWindowViewModel : ViewModelBase
                     {
                         Dispatcher.UIThread.Post(() =>
                         {
-                            MediaFiles.Add(new MediaFile(item.Value.Path, item.Value.Directories!));
+                            var vm = new MediaFileViewModel(new MediaFile(item.Value.Path, item.Value.Directories!));
+                            _ = vm.LoadThumbnailAsync();
+                            MediaFiles.Add(vm);
                         });
                     }
                 }
@@ -264,7 +266,9 @@ public class MainWindowViewModel : ViewModelBase
                 {
                     Dispatcher.UIThread.Post(() =>
                     {
-                        MediaFiles.Add(new MediaFile(item.Value.Path, item.Value.Directories!));
+                        var vm = new MediaFileViewModel(new MediaFile(item.Value.Path, item.Value.Directories!));
+                        _ = vm.LoadThumbnailAsync();
+                        MediaFiles.Add(vm);
                     });
                 }
             }
