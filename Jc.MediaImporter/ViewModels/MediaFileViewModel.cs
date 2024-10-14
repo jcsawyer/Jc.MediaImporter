@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Jc.MediaImporter.Core;
+using MediaToolkit;
+using MediaToolkit.Options;
 using ReactiveUI;
 
 namespace Jc.MediaImporter.ViewModels;
@@ -43,6 +45,27 @@ public sealed class MediaFileViewModel : ViewModelBase
         {
             await using var stream = File.OpenRead(Path);
             Thumbnail = await Task.Run(() => Bitmap.DecodeToWidth(stream, 100));
+        }
+        else if (Type is MediaType.Video)
+        {
+            var video = new MediaToolkit.Model.MediaFile(Path);
+            var image = new MediaToolkit.Model.MediaFile(Path + ".jpg");
+            try
+            {
+                using var engine = new Engine(System.IO.Path.GetDirectoryName(Path));
+                engine.GetThumbnail(video, image,
+                    new ConversionOptions { Seek = TimeSpan.FromSeconds(video.Metadata.Duration.TotalSeconds / 2) });
+                await using var stream = File.OpenRead(image.Filename);
+                Thumbnail = await Task.Run(() => Bitmap.DecodeToWidth(stream, 100));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                File.Delete(image.Filename);
+            }
         }
         else
         {
