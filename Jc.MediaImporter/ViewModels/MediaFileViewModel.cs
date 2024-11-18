@@ -4,13 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using DynamicData.Binding;
 using Jc.MediaImporter.Core;
-using MediaToolkit;
-using MediaToolkit.Options;
 using ReactiveUI;
 
 namespace Jc.MediaImporter.ViewModels;
