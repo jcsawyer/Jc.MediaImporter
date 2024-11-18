@@ -31,4 +31,10 @@
     <ItemGroup>
       <ProjectReference Include="..\src\Jc.MediaImporter.Core\Jc.MediaImporter.Core.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Update="ffmpeg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>

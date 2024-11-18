@@ -33,7 +33,7 @@ public sealed class MediaFile
     public string SortedName => !string.IsNullOrEmpty(Path)
         ? $"{Date.Year}{Date.Month:00}{Date.Day:00}_{Date.Hour:00}{Date.Minute:00}{Date.Second:00}"
         : string.Empty;
-
+    
     public DateTime Date
     {
         get

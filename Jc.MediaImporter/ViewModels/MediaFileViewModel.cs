@@ -1,8 +1,13 @@
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using DynamicData.Binding;
 using Jc.MediaImporter.Core;
 using MediaToolkit;
 using MediaToolkit.Options;
@@ -48,28 +53,46 @@ public sealed class MediaFileViewModel : ViewModelBase
         }
         else if (Type is MediaType.Video)
         {
-            var video = new MediaToolkit.Model.MediaFile(Path);
-            var image = new MediaToolkit.Model.MediaFile(Path + ".jpg");
             try
             {
-                using var engine = new Engine(System.IO.Path.GetDirectoryName(Path));
-                engine.GetThumbnail(video, image,
-                    new ConversionOptions { Seek = TimeSpan.FromSeconds(video.Metadata.Duration.TotalSeconds / 2) });
-                await using var stream = File.OpenRead(image.Filename);
+                await CreateThumbnailUsingFfmpeg(Path);
+                await using var stream = File.OpenRead(Path + ".jpg");
                 Thumbnail = await Task.Run(() => Bitmap.DecodeToWidth(stream, 100));
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.Message);
+                Thumbnail = new Bitmap(AssetLoader.Open(new Uri("avares://Jc.MediaImporter/Assets/Placeholder Image.png")));
             }
             finally
             {
-                File.Delete(image.Filename);
+                File.Delete(Path + ".jpg");
             }
         }
         else
         {
             Thumbnail = new Bitmap(AssetLoader.Open(new Uri("avares://Jc.MediaImporter/Assets/Placeholder Image.png")));
         }
+    }
+
+    static Task<long> CreateThumbnailUsingFfmpeg(string path)
+    {
+        var tcs = new TaskCompletionSource<long>();
+        var process = new Process
+        {
+            StartInfo =
+            {
+                FileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ffmpeg"),
+                Arguments = "-ss 5 -an -i \"" + path + "\" -vframes:v 1 -update true -y \"" + path + ".jpg\"",
+            },
+            EnableRaisingEvents = true,
+        };
+
+        process.Exited += (sender, args) =>
+        {
+            process.Dispose();
+            tcs.SetResult(0);
+        };
+        process.Start();
+        return tcs.Task;
     }
 }
