@@ -6,7 +6,9 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.ImportView"
              x:DataType="vm:ImportViewModel">
-    <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
-        <TextBlock>Import</TextBlock>
+    <Panel HorizontalAlignment="Stretch" VerticalAlignment="Center" MaxWidth="700">
+        <StackPanel>
+            <Button Width="100" Height="100" CornerRadius="50" HorizontalAlignment="Center" Margin="10" Content="Start"></Button>
+        </StackPanel>
     </Panel>
 </UserControl>

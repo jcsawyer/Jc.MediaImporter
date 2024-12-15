@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Media;
+using Jc.MediaImporter.ViewModels;
 
 namespace Jc.MediaImporter.Models;
 
-public record NavigationMenuItem(Type ModelType, string Label, string Icon, Brush Background);
+public record NavigationMenuItem(Func<ViewModelBase> Factory, string Label, string Icon, Brush Background);

@@ -1,8 +1,10 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Jc.MediaImporter.ViewModels;
 using Jc.MediaImporter.Views;
+using ReactiveUI;
 
 namespace Jc.MediaImporter;
 
@@ -11,6 +13,9 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+
+        var settings = SettingsViewModel.Instance;
+        settings.PropertyChanged += (_, _) => settings.Save();
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -24,5 +29,18 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+    
+    public static void Quit(int exitCode)
+    {
+        if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow?.Close();
+            desktop.Shutdown(exitCode);
+        }
+        else
+        {
+            Environment.Exit(exitCode);
+        }
     }
 }

@@ -8,7 +8,13 @@
         <entry key="Jc.MediaImporter/Controls/TitleBar.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Resources/Icons.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Resources/Styles.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
+        <entry key="Jc.MediaImporter/Styles/Colors.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
+        <entry key="Jc.MediaImporter/Styles/Core/ListBoxStyles.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
+        <entry key="Jc.MediaImporter/Styles/Core/TextBoxStyles.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
+        <entry key="Jc.MediaImporter/Styles/ListBoxStyles.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Styles/Styles.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
+        <entry key="Jc.MediaImporter/Styles/TextBoxStyles.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
+        <entry key="Jc.MediaImporter/Styles/Theme.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/ImportView.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/MainView.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/MainWindow.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />

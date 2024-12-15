@@ -3,10 +3,63 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
+             xmlns:i="https://github.com/projektanker/icons.avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
-    <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
-        <TextBlock>Settings</TextBlock>
+    <Panel HorizontalAlignment="Stretch" VerticalAlignment="Center" MaxWidth="700">
+        <Grid RowDefinitions="36,36,36" ColumnDefinitions="Auto,*">
+            <!-- Default source directory -->
+            <TextBlock Grid.Row="0" Grid.Column="0"
+                       Text="Default source directory:"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Margin="0,0,16,0"/>
+            <TextBox x:Name="SourceDirectory"
+                     Grid.Row="0" Grid.Column="1"
+                     Watermark="Default source directory"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Center"
+                     Text="{Binding DefaultSourceDirectory, Mode=TwoWay}">
+                <TextBox.InnerRightContent>
+                    <Button Grid.Row="1" i:Attached.Icon="mdi-folder-open-outline" Classes="icon_button"
+                            Foreground="#ccffffff" Click="SelectDefaultSourceDirectory" />
+                </TextBox.InnerRightContent>
+            </TextBox>
+            <!-- Default Photos directory -->
+            <TextBlock Grid.Row="1" Grid.Column="0"
+                       Text="Default photos directory:"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Margin="0,0,16,0"/>
+            <TextBox x:Name="PhotosDirectory"
+                     Grid.Row="1" Grid.Column="1"
+                     Watermark="Default photos directory"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Center"
+                     Text="{Binding DefaultPhotosDirectory, Mode=TwoWay}">
+                <TextBox.InnerRightContent>
+                    <Button Grid.Row="1" i:Attached.Icon="mdi-folder-open-outline" Classes="icon_button"
+                            Foreground="#ccffffff" Click="SelectDefaultPhotosDirectory" />
+                </TextBox.InnerRightContent>
+            </TextBox>
+            <!-- Default Videos directory -->
+            <TextBlock Grid.Row="2" Grid.Column="0"
+                       Text="Default videos directory:"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Margin="0,0,16,0"/>
+            <TextBox x:Name="VideosDirectory"
+                     Grid.Row="2" Grid.Column="1"
+                     Watermark="Default photos directory"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Center"
+                     Text="{Binding DefaultVideosDirectory, Mode=TwoWay}">
+                <TextBox.InnerRightContent>
+                    <Button Grid.Row="1" i:Attached.Icon="mdi-folder-open-outline" Classes="icon_button"
+                            Foreground="#ccffffff" Click="SelectDefaultVideosDirectory" />
+                </TextBox.InnerRightContent>
+            </TextBox>
+        </Grid>
     </Panel>
 </UserControl>

@@ -33,7 +33,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 return;
             }
 
-            var vm = Activator.CreateInstance(value.ModelType);
+            var vm = value.Factory();
             if (vm is not ViewModelBase vmb)
             {
                 return;
@@ -48,18 +48,18 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private readonly List<NavigationMenuItem> _menuItems =
     [
-        new NavigationMenuItem(typeof(MainViewModel), "Home", "home_regular", new LinearGradientBrush
+        new NavigationMenuItem(() => new MainViewModel(), "Home", "home_regular", new LinearGradientBrush
         {
             GradientStops =
                 [new GradientStop(Color.Parse("#F6A09A"), 0), new GradientStop(Color.Parse("#8A1F1D"), 1)]
         }),
-        new NavigationMenuItem(typeof(ImportViewModel), "Import", "arrow_download_regular", new LinearGradientBrush { GradientStops =
+        new NavigationMenuItem(() => new ImportViewModel(), "Import", "arrow_download_regular", new LinearGradientBrush { GradientStops =
             [new GradientStop(Color.Parse("#ED765E"), 0), new GradientStop(Color.Parse("#FEA858"), 1)]
         }),
-        new NavigationMenuItem(typeof(ManageViewModel), "Manage", "library_regular", new LinearGradientBrush { GradientStops =
+        new NavigationMenuItem(() => new ManageViewModel(), "Manage", "library_regular", new LinearGradientBrush { GradientStops =
             [new GradientStop(Color.Parse("#4B086D"), 0), new GradientStop(Color.Parse("#ACC0FE"), 1)]
         }),
-        new NavigationMenuItem(typeof(SettingsViewModel), "Settings", "settings_regular", new LinearGradientBrush { GradientStops =
+        new NavigationMenuItem(() => SettingsViewModel.Instance, "Settings", "settings_regular", new LinearGradientBrush { GradientStops =
             [new GradientStop(Color.Parse("#B51F1A"), 0), new GradientStop(Color.Parse("#F98EF6"), 1)]
         }),
     ];
