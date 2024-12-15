@@ -14,16 +14,25 @@
                     IsOpen="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                     Message="{Binding Error}" IsClosable="False" Severity="Error"
                     Background="{DynamicResource SystemFillColorCritical}" IsIconVisible="False">
-
         </ui:InfoBar>
         <Panel DockPanel.Dock="Bottom">
-            <Button Content="Cancel" HorizontalAlignment="Center" Command="{Binding StopImportCommand}"></Button>
+            <Button Content="Cancel" HorizontalAlignment="Center" Command="{Binding StopImportCommand}">
+                <Button.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                        <Binding Path="IsLoading"></Binding>
+                        <Binding Path="Error" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"></Binding>
+                    </MultiBinding>
+                </Button.IsVisible>
+            </Button>
         </Panel>
         <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center"
                          IsVisible="{Binding IsLoading}" />
         <StackPanel IsVisible="{Binding Media, Converter={x:Static converters:CollectionConverters.IsNotNullOrEmpty}}"
                     VerticalAlignment="Center">
             <TextBlock Text="{Binding Media.Count, FallbackValue=null, StringFormat='{}{0} files discovered'}"></TextBlock>
+            <Button Width="100" Height="100" CornerRadius="50" HorizontalAlignment="Center" Margin="10"
+                    Content="Continue">
+            </Button>
         </StackPanel>
     </DockPanel>
 </UserControl>
