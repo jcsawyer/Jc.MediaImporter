@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -40,20 +41,24 @@ public sealed class MediaFileViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _thumbnail, value);
     }
 
-    public async Task LoadThumbnailAsync()
+    public async Task LoadThumbnailAsync(CancellationToken cancellationToken)
     {
         if (Type is MediaType.Photo)
         {
             await using var stream = File.OpenRead(Path);
-            Thumbnail = await Task.Run(() => Bitmap.DecodeToWidth(stream, 100));
+            Thumbnail = await Task.Run(() => Bitmap.DecodeToWidth(stream, 100), cancellationToken);
         }
         else if (Type is MediaType.Video)
         {
             try
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
                 await CreateThumbnailUsingFfmpeg(Path);
                 await using var stream = File.OpenRead(Path + ".jpg");
-                Thumbnail = await Task.Run(() => Bitmap.DecodeToWidth(stream, 100));
+                Thumbnail = await Task.Run(() => Bitmap.DecodeToWidth(stream, 100), cancellationToken);
             }
             catch
             {

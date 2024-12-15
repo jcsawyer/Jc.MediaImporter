@@ -23,7 +23,7 @@
                          IsVisible="{Binding IsLoading}" />
         <StackPanel IsVisible="{Binding Media, Converter={x:Static converters:CollectionConverters.IsNotNullOrEmpty}}"
                     VerticalAlignment="Center">
-            <TextBlock Text="{Binding Media.Count, StringFormat='{}{0} files discovered'}"></TextBlock>
+            <TextBlock Text="{Binding Media.Count, FallbackValue=null, StringFormat='{}{0} files discovered'}"></TextBlock>
         </StackPanel>
     </DockPanel>
 </UserControl>

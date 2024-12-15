@@ -30,6 +30,8 @@ public class LoadImportViewModel : ViewModelBase
     
     public ICommand StopImportCommand { get; }
 
+    private CancellationTokenSource? _cancellationTokenSource;
+    
     private ObservableCollection<MediaFileViewModel>? _media;
 
     public ObservableCollection<MediaFileViewModel>? Media
@@ -56,12 +58,19 @@ public class LoadImportViewModel : ViewModelBase
     
     private void StopImport()
     {
-        Dispatcher.UIThread.Post(() => { _import.StopImportCommand.Execute(null); });
+        Dispatcher.UIThread.Post(() =>
+        {
+            _cancellationTokenSource?.Cancel();
+            _import.StopImportCommand.Execute(null);
+        });
     }
 
     private void LoadMedia(string sourceDirectory)
     {
         Media = null;
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = _cancellationTokenSource.Token;
         
         if (!Directory.Exists(sourceDirectory))
         {
@@ -88,6 +97,11 @@ public class LoadImportViewModel : ViewModelBase
         var result = new ConcurrentBag<MediaFileViewModel>();
         TraverseTreeParallelForEach(sourceDirectory, (file) =>
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+            
             var item = GetMetaData(file);
             if (item is null)
             {
@@ -95,7 +109,7 @@ public class LoadImportViewModel : ViewModelBase
             }
             
             var vm = new MediaFileViewModel(new MediaFile(item.Value.Path, item.Value.Directories));
-            Task.Run(() => vm.LoadThumbnailAsync());
+            Task.Run(() => vm.LoadThumbnailAsync(cancellationToken), cancellationToken);
             result.Add(vm);
         });
         Media = new ObservableCollection<MediaFileViewModel>(result.ToList());
