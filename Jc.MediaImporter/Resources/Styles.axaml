@@ -5,6 +5,14 @@
         </StackPanel>
     </Design.PreviewWith>
     
+    <Style Selector="TextBlock">
+        <Setter Property="Foreground" Value="White"></Setter>
+    </Style>
+    
+    <Style Selector="PathIcon">
+        <Setter Property="Foreground" Value="White"></Setter>
+    </Style>
+    
     <Style Selector="TextBlock.h1">
         <Setter Property="FontSize" Value="18" />
         <Setter Property="FontWeight" Value="Medium" />

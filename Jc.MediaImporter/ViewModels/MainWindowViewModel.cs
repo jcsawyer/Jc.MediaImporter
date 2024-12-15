@@ -6,13 +6,18 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Jc.MediaImporter.Core;
+using Jc.MediaImporter.Models;
+using MetadataExtractor;
 using ReactiveUI;
+using Directory = System.IO.Directory;
 
 namespace Jc.MediaImporter.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase
 {
     private static readonly string PhotoTarget = "Photos";
     private static readonly string VideoTarget = Path.Combine("Home Videos", "Captured");
@@ -21,10 +26,77 @@ public class MainWindowViewModel : ViewModelBase
     {
         LoadMediaCommand = ReactiveCommand.Create(LoadMedia);
         ImportMediaCommand = ReactiveCommand.Create(ImportMedia);
+        NavigateCommand = ReactiveCommand.Create<NavigationMenuItem>(value =>
+        {
+            if (value is null)
+            {
+                return;
+            }
+
+            var vm = Activator.CreateInstance(value.ModelType);
+            if (vm is not ViewModelBase vmb)
+            {
+                return;
+            }
+
+            CurrentPage = vmb;
+        });
+
+        NavigationItems = new ObservableCollection<NavigationMenuItem>(_menuItems);
+        ActiveNavigationItem = NavigationItems.First();
     }
+
+    private readonly List<NavigationMenuItem> _menuItems =
+    [
+        new NavigationMenuItem(typeof(MainViewModel), "Home", "home_regular", new LinearGradientBrush
+        {
+            GradientStops =
+                [new GradientStop(Color.Parse("#F6A09A"), 0), new GradientStop(Color.Parse("#8A1F1D"), 1)]
+        }),
+        new NavigationMenuItem(typeof(ImportViewModel), "Import", "arrow_download_regular", new LinearGradientBrush { GradientStops =
+            [new GradientStop(Color.Parse("#ED765E"), 0), new GradientStop(Color.Parse("#FEA858"), 1)]
+        }),
+        new NavigationMenuItem(typeof(ManageViewModel), "Manage", "library_regular", new LinearGradientBrush { GradientStops =
+            [new GradientStop(Color.Parse("#4B086D"), 0), new GradientStop(Color.Parse("#ACC0FE"), 1)]
+        }),
+        new NavigationMenuItem(typeof(SettingsViewModel), "Settings", "settings_regular", new LinearGradientBrush { GradientStops =
+            [new GradientStop(Color.Parse("#B51F1A"), 0), new GradientStop(Color.Parse("#F98EF6"), 1)]
+        }),
+    ];
 
     public ICommand LoadMediaCommand { get; }
     public ICommand ImportMediaCommand { get; }
+    public ICommand NavigateCommand { get; }
+
+    private Brush _tintColor = new LinearGradientBrush
+    {
+        GradientStops =
+            [new GradientStop(Color.Parse("#F6A09A"), 0), new GradientStop(Color.Parse("#8A1F1D"), 1)]
+    };
+
+    public Brush TintColor
+    {
+        get => _tintColor;
+        set => this.RaiseAndSetIfChanged(ref _tintColor, value);
+    }
+
+    private ViewModelBase _currentPage = new MainViewModel();
+
+    public ViewModelBase CurrentPage
+    {
+        get => _currentPage;
+        set => this.RaiseAndSetIfChanged(ref _currentPage, value);
+    }
+
+    public ObservableCollection<NavigationMenuItem> NavigationItems { get; }
+
+    private NavigationMenuItem _activeNavigationItem;
+
+    public NavigationMenuItem ActiveNavigationItem
+    {
+        get => _activeNavigationItem;
+        set => this.RaiseAndSetIfChanged(ref _activeNavigationItem, value);
+    }
 
     private bool _isLoading;
 
@@ -74,7 +146,8 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _importProgressTotal, value);
     }
 
-    public ObservableCollection<MediaFileViewModel> MediaFiles { get; } = new ObservableCollection<MediaFileViewModel>();
+    public ObservableCollection<MediaFileViewModel> MediaFiles { get; } =
+        new ObservableCollection<MediaFileViewModel>();
 
     private void ImportMedia()
     {
@@ -118,10 +191,7 @@ public class MainWindowViewModel : ViewModelBase
             processedItems++;
             progress = (int)Math.Ceiling((float)processedItems / totalItems * 100);
             //worker!.ReportProgress(progress);
-            Dispatcher.UIThread.Post(() =>
-            {
-                ImportProgress = processedItems;
-            });
+            Dispatcher.UIThread.Post(() => { ImportProgress = processedItems; });
         }
 
         // TODO we also need to group by media type
@@ -217,7 +287,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             try
             {
-                var directories = MetadataExtractor.ImageMetadataReader.ReadMetadata(path);
+                var directories = ImageMetadataReader.ReadMetadata(path);
                 return (path, directories);
             }
             catch

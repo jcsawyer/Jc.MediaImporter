@@ -2,8 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Jc.MediaImporter.App"
              xmlns:local="using:Jc.MediaImporter"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia">
 
     <Application.DataTemplates>
         <local:ViewLocator/>
@@ -17,8 +16,8 @@
     </Application.Resources>
   
     <Application.Styles>
-        <FluentTheme />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True" />
+        <StyleInclude Source="/Resources/Icons.axaml"></StyleInclude>
         <StyleInclude Source="/Resources/Styles.axaml"></StyleInclude>
     </Application.Styles>
 </Application>
