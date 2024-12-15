@@ -26,7 +26,7 @@
         <Border Background="{Binding ActiveNavigationItem.Background}">
             <Border.Transitions>
                 <Transitions>
-                    <BrushTransition Property="Background" Duration="0:0:0.3"></BrushTransition>
+                    <BrushTransition Property="Background" Duration="0:0:0.7"></BrushTransition>
                 </Transitions>
             </Border.Transitions>
             <Panel Margin="40">
@@ -72,7 +72,7 @@
                         </ListBox>
                     </SplitView.Pane>
                     <SplitView.Content>
-                       <TransitioningContentControl Content="{Binding CurrentPage, Mode=OneWay}">
+                       <TransitioningContentControl Content="{Binding CurrentPage, Mode=OneWay}" VerticalAlignment="Stretch" VerticalContentAlignment="Center">
                            <TransitioningContentControl.PageTransition>
                                <CompositePageTransition>
                                    <CrossFade Duration="0:00:00.300"></CrossFade>

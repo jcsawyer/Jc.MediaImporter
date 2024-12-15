@@ -3,7 +3,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Jc.MediaImporter.Views.Import.LoadImportView">
-    <ui:ProgressRing />
+             x:Class="Jc.MediaImporter.Views.Import.LoadImportView"
+             x:DataType="vm:Import.LoadImportViewModel">
+    <UserControl.VerticalAlignment>Stretch</UserControl.VerticalAlignment>
+    <DockPanel HorizontalAlignment="Center">
+        <Panel DockPanel.Dock="Bottom">
+            <Button Content="Cancel" HorizontalAlignment="Center" Command="{Binding StopImportCommand}"></Button>
+        </Panel>
+            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center" IsVisible="{Binding IsLoading}" />
+    </DockPanel>
 </UserControl>

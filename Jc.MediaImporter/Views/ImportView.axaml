@@ -6,8 +6,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.ImportView"
              x:DataType="vm:ImportViewModel">
-    <Panel HorizontalAlignment="Stretch" VerticalAlignment="Center" MaxWidth="700">
-        <TransitioningContentControl Content="{Binding CurrentPage, Mode=OneWay}">
+    <Panel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MaxWidth="700" MinHeight="400">
+        <TransitioningContentControl Content="{Binding CurrentPage, Mode=OneWay}" VerticalAlignment="Stretch">
             <TransitioningContentControl.PageTransition>
                 <CrossFade Duration="0:00:00.200"></CrossFade>
             </TransitioningContentControl.PageTransition>

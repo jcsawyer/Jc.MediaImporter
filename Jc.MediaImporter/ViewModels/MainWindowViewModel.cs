@@ -53,7 +53,7 @@ public partial class MainWindowViewModel : ViewModelBase
             GradientStops =
                 [new GradientStop(Color.Parse("#F6A09A"), 0), new GradientStop(Color.Parse("#8A1F1D"), 1)]
         }),
-        new NavigationMenuItem(() => new ImportViewModel(), "Import", "arrow_download_regular", new LinearGradientBrush { GradientStops =
+        new NavigationMenuItem(() => ImportViewModel.Instance, "Import", "arrow_download_regular", new LinearGradientBrush { GradientStops =
             [new GradientStop(Color.Parse("#ED765E"), 0), new GradientStop(Color.Parse("#FEA858"), 1)]
         }),
         new NavigationMenuItem(() => new ManageViewModel(), "Manage", "library_regular", new LinearGradientBrush { GradientStops =

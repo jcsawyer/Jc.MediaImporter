@@ -26,7 +26,8 @@ sealed class Program
         var builder = AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .LogToTrace();
+            .LogToTrace()
+            .UseReactiveUI();
         
         Native.OS.SetupApp(builder);
         return builder;
