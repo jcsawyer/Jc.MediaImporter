@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
+             xmlns:converters="clr-namespace:Jc.MediaImporter.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Jc.MediaImporter.Views.MediaFileView"
+             x:DataType="vm:MediaFileViewModel">
+    <StackPanel Spacing="5" Width="100">
+        <Border CornerRadius="10" ClipToBounds="True">
+            <Panel Background="#7FFF22DD">
+                <Image Width="100" Stretch="Uniform" Source="{Binding Thumbnail}" />
+                <Panel Height="100" IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNull}}">
+                    <PathIcon Height="75" Width="75" Data="{Binding Type, Converter={x:Static converters:TypeConverters.MediaTypeToIconKeyConverter}}" />
+                </Panel>
+            </Panel>
+        </Border>
+        <TextBlock Text="{Binding  Name}" HorizontalAlignment="Center" />
+        <TextBlock Text="{Binding SortedName}" HorizontalAlignment="Center" />
+    </StackPanel>
+</UserControl>

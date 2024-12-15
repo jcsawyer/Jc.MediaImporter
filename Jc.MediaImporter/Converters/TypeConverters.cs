@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using Jc.MediaImporter.Core;
 
 namespace Jc.MediaImporter.Converters;
 
@@ -18,4 +19,15 @@ public class TypeConverters
             Application.Current!.TryFindResource(iconKey, out var resource);
             return resource as StreamGeometry ?? StreamGeometry.Parse(StreamGeometryNotFound);
         });
+    
+    public static FuncValueConverter<MediaType, string> MediaTypeToIconKeyConverter { get; } =
+        new(mediaType =>
+        {
+            return mediaType switch
+            {
+                MediaType.Photo => "image_regular",
+                MediaType.Video => "video_regular",
+                _ => "document_unknown_regular"
+            };
+        }); 
 }

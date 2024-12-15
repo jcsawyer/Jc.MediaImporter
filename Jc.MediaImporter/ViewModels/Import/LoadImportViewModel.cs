@@ -25,10 +25,12 @@ public class LoadImportViewModel : ViewModelBase
     {
         _import = import ?? throw new ArgumentNullException(nameof(import));
         StopImportCommand = ReactiveCommand.Create(StopImport);
+        ConfigureImportCommand = ReactiveCommand.Create(ConfigureImport);
         Task.Run(() => LoadMedia(SettingsViewModel.Instance.DefaultSourceDirectory));
     }
     
     public ICommand StopImportCommand { get; }
+    public ICommand ConfigureImportCommand { get; }
 
     private CancellationTokenSource? _cancellationTokenSource;
     
@@ -38,6 +40,13 @@ public class LoadImportViewModel : ViewModelBase
     {
         get => _media;
         set => this.RaiseAndSetIfChanged(ref _media, value);
+    }
+
+    private ObservableCollection<MediaFileErrorViewModel>? _errorMedia;
+    public ObservableCollection<MediaFileErrorViewModel>? ErrorMedia
+    {
+        get => _errorMedia;
+        set => this.RaiseAndSetIfChanged(ref _errorMedia, value);
     }
     
     private bool _isLoading = true;
@@ -55,14 +64,28 @@ public class LoadImportViewModel : ViewModelBase
         get => _error;
         set => this.RaiseAndSetIfChanged(ref _error, value);
     }
+
+    private string _currentFile;
+    public string CurrentFile
+    {
+        get => _currentFile;
+        set => this.RaiseAndSetIfChanged(ref _currentFile, value);
+    }
     
     private void StopImport()
     {
         Dispatcher.UIThread.Post(() =>
         {
             _cancellationTokenSource?.Cancel();
+            Error = string.Empty;
+            CurrentFile = string.Empty;
             _import.StopImportCommand.Execute(null);
         });
+    }
+
+    private void ConfigureImport()
+    {
+        Dispatcher.UIThread.Post(() => _import.ConfigureImportCommand.Execute((Media, ErrorMedia)));
     }
 
     private void LoadMedia(string sourceDirectory)
@@ -78,6 +101,9 @@ public class LoadImportViewModel : ViewModelBase
             Error = "Invalid source directory, please check your settings and try again.";
         }
         
+        var result = new ConcurrentBag<MediaFileViewModel>();
+        var errors = new ConcurrentBag<MediaFileErrorViewModel>();
+        
         (string Path, IReadOnlyList<MetadataExtractor.Directory?> Directories)? GetMetaData(string path)
         {
             try
@@ -85,18 +111,16 @@ public class LoadImportViewModel : ViewModelBase
                 var directories = ImageMetadataReader.ReadMetadata(path);
                 return (path, directories);
             }
-            catch
+            catch (Exception ex)
             {
-                // Swallow exception for now
-                Debug.WriteLine($"Could not read metadata for file {path}");
+                errors.Add(new MediaFileErrorViewModel(path, ex.Message));
                 return null;
-                // TODO Create a list of failures and report in UI
             }
         }
 
-        var result = new ConcurrentBag<MediaFileViewModel>();
         TraverseTreeParallelForEach(sourceDirectory, (file) =>
         {
+            CurrentFile = file;
             if (cancellationToken.IsCancellationRequested)
             {
                 return;
@@ -113,6 +137,7 @@ public class LoadImportViewModel : ViewModelBase
             result.Add(vm);
         });
         Media = new ObservableCollection<MediaFileViewModel>(result.ToList());
+        ErrorMedia = new ObservableCollection<MediaFileErrorViewModel>(errors.ToList());
         IsLoading = false;
     }
     

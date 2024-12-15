@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Jc.MediaImporter.ViewModels.Import;
 using ReactiveUI;
@@ -14,10 +15,12 @@ public class ImportViewModel : ViewModelBase
         _currentPage = new StartImportViewModel(this);
         StopImportCommand = ReactiveCommand.Create(StopImport);
         StartImportCommand = ReactiveCommand.Create(StartImport);
+        ConfigureImportCommand = ReactiveCommand.Create<(ObservableCollection<MediaFileViewModel>, ObservableCollection<MediaFileErrorViewModel>)>(ConfigureImport);
     }
     
     public ICommand StopImportCommand { get; }
     public ICommand StartImportCommand { get; }
+    public ICommand ConfigureImportCommand { get; }
     
     private ViewModelBase _currentPage;
 
@@ -36,5 +39,10 @@ public class ImportViewModel : ViewModelBase
     private void StartImport()
     {
         CurrentPage = new LoadImportViewModel(this);
+    }
+    
+    private void ConfigureImport((ObservableCollection<MediaFileViewModel> Media, ObservableCollection<MediaFileErrorViewModel> Errors) media)
+    {
+        CurrentPage = new ConfigureImportViewModel(this, media.Media, media.Errors);
     }
 }

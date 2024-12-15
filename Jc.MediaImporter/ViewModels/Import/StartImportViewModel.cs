@@ -20,6 +20,6 @@ public class StartImportViewModel : ViewModelBase
 
     private void StartImport()
     {
-        Dispatcher.UIThread.Post(() => { _import.StartImportCommand.Execute(null); });
+        Dispatcher.UIThread.Post(() => _import.StartImportCommand.Execute(null));
     }
 }

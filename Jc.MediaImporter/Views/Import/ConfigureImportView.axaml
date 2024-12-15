@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Jc.MediaImporter.Views.Import.ConfigureImportView"
+             x:DataType="vm:Import.ConfigureImportViewModel">
+    <TabControl Margin="5">
+        <TabItem Header="Summary">
+            <TextBlock Margin="5">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0} files processed / {1} errors">
+                        <Binding Path="Media.Count" FallbackValue="0"/>
+                        <Binding Path="ErrorMedia.Count" FallbackValue="0"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </TabItem>
+        <TabItem Header="Photos">
+            <ListBox ItemsSource="{Binding Photos}"
+                     Background="Transparent" Margin="0 20">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+        </TabItem>
+        <TabItem Header="Videos">
+            <TextBlock Margin="5">This is tab 3 content</TextBlock>
+        </TabItem>
+        <TabItem Header="Failed" IsVisible="{Binding ErrorMedia.Count, FallbackValue=0}">
+            <TextBlock Margin="5">This is tab 3 content</TextBlock>
+        </TabItem>
+    </TabControl>
+</UserControl>

@@ -25,13 +25,17 @@
                 </Button.IsVisible>
             </Button>
         </Panel>
-        <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center"
-                         IsVisible="{Binding IsLoading}" />
+        <StackPanel IsVisible="{Binding IsLoading}"
+                    VerticalAlignment="Center">
+            <TextBlock Text="{Binding CurrentFile}" HorizontalAlignment="Center"></TextBlock>
+            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center" />
+        </StackPanel>
         <StackPanel IsVisible="{Binding Media, Converter={x:Static converters:CollectionConverters.IsNotNullOrEmpty}}"
                     VerticalAlignment="Center">
-            <TextBlock Text="{Binding Media.Count, FallbackValue=null, StringFormat='{}{0} files discovered'}"></TextBlock>
+            <TextBlock Text="{Binding Media.Count, FallbackValue=null, StringFormat='{}{0} files processed'}" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Text="{Binding ErrorMedia.Count, FallbackValue=null, StringFormat='{}{0} files failed'}" HorizontalAlignment="Center"></TextBlock>
             <Button Width="100" Height="100" CornerRadius="50" HorizontalAlignment="Center" Margin="10"
-                    Content="Continue">
+                    Content="Continue" Command="{Binding ConfigureImportCommand}">
             </Button>
         </StackPanel>
     </DockPanel>
