@@ -4,14 +4,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
+             xmlns:converters="clr-namespace:Jc.MediaImporter.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.Import.LoadImportView"
              x:DataType="vm:Import.LoadImportViewModel">
     <UserControl.VerticalAlignment>Stretch</UserControl.VerticalAlignment>
     <DockPanel HorizontalAlignment="Center">
+        <ui:InfoBar DockPanel.Dock="Top" HorizontalAlignment="Stretch" Title="Failed"
+                    IsOpen="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    Message="{Binding Error}" IsClosable="False" Severity="Error"
+                    Background="{DynamicResource SystemFillColorCritical}" IsIconVisible="False">
+
+        </ui:InfoBar>
         <Panel DockPanel.Dock="Bottom">
             <Button Content="Cancel" HorizontalAlignment="Center" Command="{Binding StopImportCommand}"></Button>
         </Panel>
-            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center" IsVisible="{Binding IsLoading}" />
+        <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center"
+                         IsVisible="{Binding IsLoading}" />
+        <StackPanel IsVisible="{Binding Media, Converter={x:Static converters:CollectionConverters.IsNotNullOrEmpty}}"
+                    VerticalAlignment="Center">
+            <TextBlock Text="{Binding Media.Count, StringFormat='{}{0} files discovered'}"></TextBlock>
+        </StackPanel>
     </DockPanel>
 </UserControl>
