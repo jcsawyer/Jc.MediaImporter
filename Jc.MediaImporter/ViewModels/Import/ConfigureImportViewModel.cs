@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reactive.Linq;
 using DynamicData;
 using Jc.MediaImporter.Core;
@@ -27,6 +26,12 @@ public class ConfigureImportViewModel : ViewModelBase
             .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(out _photos)
             .Subscribe();
+        
+        _mediaCache.Connect()
+            .Filter(x => x.Type == MediaType.Video)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Bind(out _videos)
+            .Subscribe();
     }
     
     private SourceCache<MediaFileViewModel, string> _mediaCache = new SourceCache<MediaFileViewModel, string>(x => x.Path);
@@ -47,4 +52,7 @@ public class ConfigureImportViewModel : ViewModelBase
     
     private readonly ReadOnlyObservableCollection<MediaFileViewModel> _photos;
     public ReadOnlyObservableCollection<MediaFileViewModel> Photos => _photos;
+    
+    private readonly ReadOnlyObservableCollection<MediaFileViewModel> _videos;
+    public ReadOnlyObservableCollection<MediaFileViewModel> Videos => _videos;
 }

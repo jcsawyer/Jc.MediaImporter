@@ -33,7 +33,8 @@ public sealed class MediaFileViewModel : ViewModelBase
     
     public DateTime Date => _mediaFile.Date;
 
-    private Bitmap? _thumbnail;
+    private Bitmap? _thumbnail =
+        new Bitmap(AssetLoader.Open(new Uri("avares://Jc.MediaImporter/Assets/Placeholder Image.png")));
     public Bitmap? Thumbnail
 
     {

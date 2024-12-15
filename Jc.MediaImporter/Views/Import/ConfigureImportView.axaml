@@ -6,20 +6,22 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.Import.ConfigureImportView"
              x:DataType="vm:Import.ConfigureImportViewModel">
-    <TabControl Margin="5">
+    <TabControl Margin="5" Height="500">
         <TabItem Header="Summary">
-            <TextBlock Margin="5">
-                <TextBlock.Text>
-                    <MultiBinding StringFormat="{}{0} files processed / {1} errors">
-                        <Binding Path="Media.Count" FallbackValue="0"/>
-                        <Binding Path="ErrorMedia.Count" FallbackValue="0"/>
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
+            <WrapPanel>
+                <TextBlock Margin="5">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} files processed / {1} errors">
+                            <Binding Path="Media.Count" FallbackValue="0" />
+                            <Binding Path="ErrorMedia.Count" FallbackValue="0" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </WrapPanel>
         </TabItem>
         <TabItem Header="Photos">
             <ListBox ItemsSource="{Binding Photos}"
-                     Background="Transparent" Margin="0 20">
+                     Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
@@ -28,7 +30,14 @@
             </ListBox>
         </TabItem>
         <TabItem Header="Videos">
-            <TextBlock Margin="5">This is tab 3 content</TextBlock>
+            <ListBox ItemsSource="{Binding Videos}"
+                     Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
         </TabItem>
         <TabItem Header="Failed" IsVisible="{Binding ErrorMedia.Count, FallbackValue=0}">
             <TextBlock Margin="5">This is tab 3 content</TextBlock>
