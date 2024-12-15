@@ -15,6 +15,8 @@
         <entry key="Jc.MediaImporter/Styles/Styles.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Styles/TextBoxStyles.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Styles/Theme.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
+        <entry key="Jc.MediaImporter/Views/Import/LoadImportView.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
+        <entry key="Jc.MediaImporter/Views/Import/Start.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/ImportView.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/MainView.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/MainWindow.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />

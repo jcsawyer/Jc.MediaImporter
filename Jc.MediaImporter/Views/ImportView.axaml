@@ -7,8 +7,10 @@
              x:Class="Jc.MediaImporter.Views.ImportView"
              x:DataType="vm:ImportViewModel">
     <Panel HorizontalAlignment="Stretch" VerticalAlignment="Center" MaxWidth="700">
-        <StackPanel>
-            <Button Width="100" Height="100" CornerRadius="50" HorizontalAlignment="Center" Margin="10" Content="Start"></Button>
-        </StackPanel>
+        <TransitioningContentControl Content="{Binding CurrentPage, Mode=OneWay}">
+            <TransitioningContentControl.PageTransition>
+                <CrossFade Duration="0:00:00.200"></CrossFade>
+            </TransitioningContentControl.PageTransition>
+        </TransitioningContentControl>
     </Panel>
 </UserControl>

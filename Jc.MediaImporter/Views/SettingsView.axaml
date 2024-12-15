@@ -9,15 +9,15 @@
              x:DataType="vm:SettingsViewModel">
     <Panel HorizontalAlignment="Stretch" VerticalAlignment="Center" MaxWidth="700">
         <Grid RowDefinitions="36,36,36" ColumnDefinitions="Auto,*">
-            <!-- Default source directory -->
+            <!-- Source directory -->
             <TextBlock Grid.Row="0" Grid.Column="0"
-                       Text="Default source directory:"
+                       Text="Source directory:"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
                        Margin="0,0,16,0"/>
             <TextBox x:Name="SourceDirectory"
                      Grid.Row="0" Grid.Column="1"
-                     Watermark="Default source directory"
+                     Watermark="Path to import media from"
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Center"
                      Text="{Binding DefaultSourceDirectory, Mode=TwoWay}">
@@ -26,15 +26,15 @@
                             Foreground="#ccffffff" Click="SelectDefaultSourceDirectory" />
                 </TextBox.InnerRightContent>
             </TextBox>
-            <!-- Default Photos directory -->
+            <!-- Photos directory -->
             <TextBlock Grid.Row="1" Grid.Column="0"
-                       Text="Default photos directory:"
+                       Text="Photos directory:"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
                        Margin="0,0,16,0"/>
             <TextBox x:Name="PhotosDirectory"
                      Grid.Row="1" Grid.Column="1"
-                     Watermark="Default photos directory"
+                     Watermark="Path to import photos to"
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Center"
                      Text="{Binding DefaultPhotosDirectory, Mode=TwoWay}">
@@ -43,15 +43,15 @@
                             Foreground="#ccffffff" Click="SelectDefaultPhotosDirectory" />
                 </TextBox.InnerRightContent>
             </TextBox>
-            <!-- Default Videos directory -->
+            <!-- Videos directory -->
             <TextBlock Grid.Row="2" Grid.Column="0"
-                       Text="Default videos directory:"
+                       Text="Videos directory:"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
                        Margin="0,0,16,0"/>
             <TextBox x:Name="VideosDirectory"
                      Grid.Row="2" Grid.Column="1"
-                     Watermark="Default photos directory"
+                     Watermark="Path to import videos to"
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Center"
                      Text="{Binding DefaultVideosDirectory, Mode=TwoWay}">
