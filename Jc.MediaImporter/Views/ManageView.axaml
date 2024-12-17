@@ -7,7 +7,19 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.ManageView"
              x:DataType="vm:ManageViewModel">
-    <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
-        <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" />
-    </Panel>
+    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <TextBlock HorizontalAlignment="Center" Text="{Binding LoadingState}">
+            <TextBlock.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                    <Binding Path="IsPreparing"></Binding>
+                    <Binding Path="IsIndexing"></Binding>
+                </MultiBinding>
+            </TextBlock.IsVisible>
+        </TextBlock>
+        <ProgressBar Background="{DynamicResource TextFillColorSecondary}"
+                     Foreground="{DynamicResource TextFillColorPrimary}" IsVisible="{Binding IsIndexing}"
+                     HorizontalAlignment="Stretch" Margin="10" Value="{Binding IndexedItems}"
+                     Maximum="{Binding TotalItems}">
+        </ProgressBar>
+    </StackPanel>
 </UserControl>

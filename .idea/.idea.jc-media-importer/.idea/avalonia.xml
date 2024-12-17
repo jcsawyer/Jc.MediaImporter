@@ -24,6 +24,7 @@
         <entry key="Jc.MediaImporter/Views/MainWindow.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/ManageView.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/Media.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
+        <entry key="Jc.MediaImporter/Views/MediaFileErrorView.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/MediaFileView.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
         <entry key="Jc.MediaImporter/Views/SettingsView.axaml" value="Jc.MediaImporter/Jc.MediaImporter.csproj" />
       </map>

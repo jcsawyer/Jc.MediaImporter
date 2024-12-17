@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia.Input;
 using Avalonia.Media;
-using Avalonia.Threading;
-using Jc.MediaImporter.Core;
 using Jc.MediaImporter.Models;
-using MetadataExtractor;
 using ReactiveUI;
-using Directory = System.IO.Directory;
 
 namespace Jc.MediaImporter.ViewModels;
 
@@ -56,7 +48,7 @@ public partial class MainWindowViewModel : ViewModelBase
         new NavigationMenuItem(() => ImportViewModel.Instance, "Import", "arrow_download_regular", new LinearGradientBrush { GradientStops =
             [new GradientStop(Color.Parse("#ED765E"), 0), new GradientStop(Color.Parse("#FEA858"), 1)]
         }),
-        new NavigationMenuItem(() => new ManageViewModel(), "Manage", "library_regular", new LinearGradientBrush { GradientStops =
+        new NavigationMenuItem(() => ManageViewModel.Instance, "Manage", "library_regular", new LinearGradientBrush { GradientStops =
             [new GradientStop(Color.Parse("#4B086D"), 0), new GradientStop(Color.Parse("#ACC0FE"), 1)]
         }),
         new NavigationMenuItem(() => SettingsViewModel.Instance, "Settings", "settings_regular", new LinearGradientBrush { GradientStops =
@@ -268,7 +260,7 @@ public partial class MainWindowViewModel : ViewModelBase
     //         return;
     //     }
     //
-    //     IsLoading = true;
+    //     IsIndexing = true;
     //     MediaFiles.Clear();
     //
     //     // Run on another thread so we're not blocking
@@ -347,7 +339,7 @@ public partial class MainWindowViewModel : ViewModelBase
     //
     //     Dispatcher.UIThread.Post(() =>
     //     {
-    //         IsLoading = false;
+    //         IsIndexing = false;
     //         ImportProgressTotal = totalItems;
     //     });
     // }*/

@@ -1,3 +1,7 @@
 namespace Jc.MediaImporter.ViewModels;
 
-public class MediaFileErrorViewModel(string Path, string Error);
+public sealed class MediaFileErrorViewModel
+{
+    public string Path { get; set; }
+    public string Error { get; set; }
+}

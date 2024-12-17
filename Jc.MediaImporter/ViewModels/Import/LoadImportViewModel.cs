@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Threading;
 using Jc.MediaImporter.Core;
+using Jc.MediaImporter.Helpers;
 using MetadataExtractor;
 using ReactiveUI;
 using Directory = System.IO.Directory;
@@ -113,12 +114,16 @@ public class LoadImportViewModel : ViewModelBase
             }
             catch (Exception ex)
             {
-                errors.Add(new MediaFileErrorViewModel(path, ex.Message));
+                if (path.Contains(".DS_Store", StringComparison.OrdinalIgnoreCase) || ex.Message.Equals("File format could not be determined", StringComparison.OrdinalIgnoreCase))
+                {
+                    return null;
+                }
+                errors.Add(new MediaFileErrorViewModel { Path = path, Error = ex.Message });
                 return null;
             }
         }
 
-        TraverseTreeParallelForEach(sourceDirectory, (file) =>
+        Files.TraverseTreeParallelForEach(sourceDirectory, (file) =>
         {
             CurrentFile = file;
             if (cancellationToken.IsCancellationRequested)
@@ -139,120 +144,5 @@ public class LoadImportViewModel : ViewModelBase
         Media = new ObservableCollection<MediaFileViewModel>(result.ToList());
         ErrorMedia = new ObservableCollection<MediaFileErrorViewModel>(errors.ToList());
         IsLoading = false;
-    }
-    
-    private static void TraverseTreeParallelForEach(string root, Action<string> action)
-    {
-        //Count of files traversed and timer for diagnostic output
-        int fileCount = 0;
-        var sw = Stopwatch.StartNew();
-
-        // Determine whether to parallelize file processing on each folder based on processor count.
-        int procCount = Environment.ProcessorCount;
-
-        // Data structure to hold names of subfolders to be examined for files.
-        Stack<string> dirs = new Stack<string>();
-
-        if (!Directory.Exists(root))
-        {
-            throw new ArgumentException(
-                "The given root directory doesn't exist.", nameof(root));
-        }
-        dirs.Push(root);
-
-        while (dirs.Count > 0)
-        {
-            string currentDir = dirs.Pop();
-            string[] subDirs = { };
-            string[] files = { };
-
-            try
-            {
-                subDirs = Directory.GetDirectories(currentDir);
-            }
-            // Thrown if we do not have discovery permission on the directory.
-            catch (UnauthorizedAccessException e)
-            {
-                Console.WriteLine(e.Message);
-                continue;
-            }
-            // Thrown if another process has deleted the directory after we retrieved its name.
-            catch (DirectoryNotFoundException e)
-            {
-                Console.WriteLine(e.Message);
-                continue;
-            }
-
-            try
-            {
-                files = Directory.GetFiles(currentDir);
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                Console.WriteLine(e.Message);
-                continue;
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                Console.WriteLine(e.Message);
-                continue;
-            }
-            catch (IOException e)
-            {
-                Console.WriteLine(e.Message);
-                continue;
-            }
-
-            // Execute in parallel if there are enough files in the directory.
-            // Otherwise, execute sequentially.Files are opened and processed
-            // synchronously but this could be modified to perform async I/O.
-            try
-            {
-                if (files.Length < procCount)
-                {
-                    foreach (var file in files)
-                    {
-                        action(file);
-                        fileCount++;
-                    }
-                }
-                else
-                {
-                    Parallel.ForEach(files, () => 0,
-                        (file, loopState, localCount) =>
-                        {
-                            action(file);
-                            return (int)++localCount;
-                        },
-                        (c) =>
-                        {
-                            Interlocked.Add(ref fileCount, c);
-                        });
-                }
-            }
-            catch (AggregateException ae)
-            {
-                ae.Handle((ex) =>
-                {
-                    if (ex is UnauthorizedAccessException)
-                    {
-                        // Here we just output a message and go on.
-                        Console.WriteLine(ex.Message);
-                        return true;
-                    }
-                    // Handle other exceptions here if necessary...
-
-                    return false;
-                });
-            }
-
-            // Push the subdirectories onto the stack for traversal.
-            // This could also be done before handing the files.
-            foreach (string str in subDirs)
-                dirs.Push(str);
-        }
-
-        // For diagnostic purposes.
-        Console.WriteLine("Processed {0} files in {1} milliseconds", fileCount, sw.ElapsedMilliseconds);
     }
 }

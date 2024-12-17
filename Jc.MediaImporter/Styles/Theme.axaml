@@ -173,16 +173,16 @@
             <StaticResource x:Key="SystemControlFocusVisualSecondaryBrush" ResourceKey="FocusStrokeColorInnerBrush"/>
 
             <!-- Based on AcrylicBrush_19h1_DynamicResources.xaml, Fallback Colors -->
-            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#F9F9F9" />
-            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#F9F9F9" />
-            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultInverseBrush" Color="#2C2C2C" />
-            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultInverseBrush" Color="#2C2C2C" />
-            <SolidColorBrush x:Key="AcrylicBackgroundFillColorBaseBrush" Color="#EEEEEE" />
-            <SolidColorBrush x:Key="AcrylicInAppFillColorBaseBrush" Color="#EEEEEE" />
-            <SolidColorBrush x:Key="AccentAcrylicBackgroundFillColorDefaultBrush" Color="{DynamicResource SystemAccentColorLight3}" />
-            <SolidColorBrush x:Key="AccentAcrylicInAppFillColorDefaultBrush" Color="{DynamicResource SystemAccentColorLight3}" />
-            <SolidColorBrush x:Key="AccentAcrylicBackgroundFillColorBaseBrush" Color="{DynamicResource SystemAccentColorLight3}" />
-            <SolidColorBrush x:Key="AccentAcrylicInAppFillColorBaseBrush" Color="{DynamicResource SystemAccentColorLight3}" />
+            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#2C2C2C" />
+            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#2C2C2C" />
+            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultInverseBrush" Color="#F9F9F9" />
+            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultInverseBrush" Color="#F9F9F9" />
+            <SolidColorBrush x:Key="AcrylicBackgroundFillColorBaseBrush" Color="#202020" />
+            <SolidColorBrush x:Key="AcrylicInAppFillColorBaseBrush" Color="#1C1C1C" />
+            <SolidColorBrush x:Key="AccentAcrylicBackgroundFillColorDefaultBrush" Color="{DynamicResource SystemAccentColorDark1}" />
+            <SolidColorBrush x:Key="AccentAcrylicInAppFillColorDefaultBrush" Color="{DynamicResource SystemAccentColorDark1}" />
+            <SolidColorBrush x:Key="AccentAcrylicBackgroundFillColorBaseBrush" Color="{DynamicResource SystemAccentColorDark2}" />
+            <SolidColorBrush x:Key="AccentAcrylicInAppFillColorBaseBrush" Color="{DynamicResource SystemControlAccentColorDark2}" />
 
 
             <!-- BEGIN CONTROL RESOURCES -->

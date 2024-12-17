@@ -8,6 +8,7 @@ public static class OS
 {
     public interface IBackend
     {
+        long GetFileSize(string path);
         void OpenInFileManager(string path, bool select);
         void SetupApp(AppBuilder builder);
     }
@@ -54,6 +55,11 @@ public static class OS
 
         if (!Directory.Exists(DataDir))
             Directory.CreateDirectory(DataDir);
+    }
+
+    public static long GetFileSize(string path)
+    {
+        return _backend.GetFileSize(path);
     }
 
     private static IBackend _backend = null;

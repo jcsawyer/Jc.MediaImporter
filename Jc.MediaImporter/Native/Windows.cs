@@ -40,6 +40,12 @@ internal class Windows : OS.IBackend
     [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = false)]
     private static extern int SHOpenFolderAndSelectItems(IntPtr pidlFolder, int cild, IntPtr apidl, int dwFlags);
 
+    public long GetFileSize(string path)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+    
     public void OpenInFileManager(string path, bool select)
     {
         string fullpath;
