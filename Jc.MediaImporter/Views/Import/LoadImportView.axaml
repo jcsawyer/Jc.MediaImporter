@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
+             xmlns:converters="clr-namespace:Jc.MediaImporter.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Jc.MediaImporter.Views.Import.LoadImportView"
+             x:DataType="vm:Import.LoadImportViewModel">
+    <UserControl.VerticalAlignment>Stretch</UserControl.VerticalAlignment>
+    <DockPanel HorizontalAlignment="Center">
+        <ui:InfoBar DockPanel.Dock="Top" HorizontalAlignment="Stretch" Title="Failed"
+                    IsOpen="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    Message="{Binding Error}" IsClosable="False" Severity="Error"
+                    Background="{DynamicResource SystemFillColorCritical}" IsIconVisible="False">
+        </ui:InfoBar>
+        <Panel DockPanel.Dock="Bottom">
+            <Button Content="Cancel" HorizontalAlignment="Center" Command="{Binding StopImportCommand}">
+                <Button.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                        <Binding Path="IsLoading"></Binding>
+                        <Binding Path="Error" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"></Binding>
+                    </MultiBinding>
+                </Button.IsVisible>
+            </Button>
+        </Panel>
+        <StackPanel IsVisible="{Binding IsLoading}"
+                    VerticalAlignment="Center">
+            <TextBlock Text="{Binding CurrentFile}" HorizontalAlignment="Center"></TextBlock>
+            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center" />
+        </StackPanel>
+        <StackPanel IsVisible="{Binding Media, Converter={x:Static converters:CollectionConverters.IsNotNullOrEmpty}}"
+                    VerticalAlignment="Center">
+            <TextBlock Text="{Binding Media.Count, FallbackValue=null, StringFormat='{}{0} files processed'}" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Text="{Binding ErrorMedia.Count, FallbackValue=null, StringFormat='{}{0} files failed'}" HorizontalAlignment="Center"></TextBlock>
+            <Button Width="100" Height="100" CornerRadius="50" HorizontalAlignment="Center" Margin="10"
+                    Content="Continue" Command="{Binding ConfigureImportCommand}">
+            </Button>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

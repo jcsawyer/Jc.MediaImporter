@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
+             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Jc.MediaImporter.Views.ManageView"
+             x:DataType="vm:ManageViewModel">
+    <Panel>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock HorizontalAlignment="Center" Text="{Binding LoadingState}">
+                <TextBlock.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                        <Binding Path="IsPreparing"></Binding>
+                        <Binding Path="IsIndexing"></Binding>
+                    </MultiBinding>
+                </TextBlock.IsVisible>
+            </TextBlock>
+            <ProgressBar Background="{DynamicResource TextFillColorSecondary}"
+                         Foreground="{DynamicResource TextFillColorPrimary}" IsVisible="{Binding IsIndexing}"
+                         HorizontalAlignment="Stretch" Margin="10" Value="{Binding IndexedItems}"
+                         Maximum="{Binding TotalItems}">
+            </ProgressBar>
+            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" IsVisible="{Binding IsPreparing}" />
+        </StackPanel>
+        <StackPanel Height="500">
+            <StackPanel.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsPreparing" Converter="{x:Static BoolConverters.Not}"></Binding>
+                    <Binding Path="IsIndexing" Converter="{x:Static BoolConverters.Not}"></Binding>
+                </MultiBinding>
+            </StackPanel.IsVisible>
+            <ui:CommandBar DefaultLabelPosition="Right">
+                <ui:CommandBar.PrimaryCommands>
+                    <ui:CommandBarToggleButton Label="(de)Select All" />
+                    <ui:CommandBarSeparator />
+                </ui:CommandBar.PrimaryCommands>
+            </ui:CommandBar>
+            <TabControl Margin="5" Height="500">
+                <TabItem Header="Summary">
+                    <ListBox x:Name="Media"
+                             ItemsSource="{Binding Media}"
+                             Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </TabItem>
+                <TabItem Header="Duplicates">
+                    <TextBlock Text="Duplicates!"></TextBlock>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </Panel>
+</UserControl>

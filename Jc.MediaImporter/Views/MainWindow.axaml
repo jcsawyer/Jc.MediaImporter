@@ -3,13 +3,17 @@
         xmlns:vm="using:Jc.MediaImporter.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        xmlns:converters="clr-namespace:Jc.MediaImporter.Converters"
+        xmlns:models="clr-namespace:Jc.MediaImporter.Models"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        Width="900" Height="600"
+        Width="1280" Height="720"
+        MinWidth="800" MinHeight="450"
         x:Class="Jc.MediaImporter.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Jc.MediaImporter">
+        Title="Jc.MediaImporter"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -17,7 +21,70 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Border Padding="10">
+    <Panel>
+        <Border Background="{Binding ActiveNavigationItem.Background}">
+            <Border.Transitions>
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.7"></BrushTransition>
+                </Transitions>
+            </Border.Transitions>
+            <Panel Margin="40">
+                <SplitView IsPaneOpen="True" PaneBackground="Transparent" DisplayMode="Inline" OpenPaneLength="175">
+                    <SplitView.Pane>
+                        <ListBox ItemsSource="{Binding NavigationItems}"
+                                 SelectedItem="{Binding ActiveNavigationItem}"
+                                 SelectionChanged="SelectingItemsControl_OnSelectionChanged"
+                                 VerticalAlignment="Center">
+                            <ListBox.Styles>
+                                <Style Selector="ListBoxItem">
+                                    <Setter Property="Padding" Value="20 15"></Setter>
+                                    <Setter Property="CornerRadius" Value="10"></Setter>
+                                    <Setter Property="Template">
+                                        <ControlTemplate>
+                                            <Panel>
+                                                <ContentPresenter Name="PART_ContentPresenter"
+                                                                  Background="{TemplateBinding Background}"
+                                                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                  Content="{TemplateBinding Content}"
+                                                                  Padding="{TemplateBinding Padding}"
+                                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                  CornerRadius="{TemplateBinding CornerRadius}"
+                                                                  Margin="2" />
+                                            </Panel>
+                                        </ControlTemplate>
+                                    </Setter>
+                                </Style>
+                            </ListBox.Styles>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:NavigationMenuItem}">
+                                    <StackPanel Spacing="17" Orientation="Horizontal">
+                                        <PathIcon
+                                            Data="{Binding Icon, Converter={x:Static converters:TypeConverters.IconConverter}}"
+                                            Width="14" />
+                                        <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </SplitView.Pane>
+                    <SplitView.Content>
+                       <TransitioningContentControl Content="{Binding CurrentPage, Mode=OneWay}" VerticalAlignment="Stretch" VerticalContentAlignment="Center">
+                           <TransitioningContentControl.PageTransition>
+                               <CompositePageTransition>
+                                   <CrossFade Duration="0:00:00.300"></CrossFade>
+                                      <PageSlide Duration="0:00:00.300"></PageSlide>
+                               </CompositePageTransition>
+                           </TransitioningContentControl.PageTransition>
+                       </TransitioningContentControl>
+                    </SplitView.Content>
+                </SplitView>
+            </Panel>
+        </Border>
+    </Panel>
+    <!--<Border Padding="10">
         <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
             <TextBox Grid.Row="0"
                      x:Name="SourceDirectory"
@@ -83,6 +150,6 @@
                          ShowProgressText="True" IsVisible="{Binding IsImporting}">
             </ProgressBar>
         </Grid>
-    </Border>
+    </Border>-->
 
 </Window>

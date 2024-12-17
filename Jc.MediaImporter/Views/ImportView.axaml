@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Jc.MediaImporter.Views.ImportView"
+             x:DataType="vm:ImportViewModel">
+    <Panel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MaxWidth="800" MinHeight="400">
+        <TransitioningContentControl Content="{Binding CurrentPage, Mode=OneWay}" VerticalAlignment="Stretch">
+            <TransitioningContentControl.PageTransition>
+                <CrossFade Duration="0:00:00.200"></CrossFade>
+            </TransitioningContentControl.PageTransition>
+        </TransitioningContentControl>
+    </Panel>
+</UserControl>

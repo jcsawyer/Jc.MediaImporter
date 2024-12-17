@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Jc.MediaImporter.Views.MediaFileErrorView"
+             x:DataType="vm:MediaFileErrorViewModel">
+    <TextBlock>
+        <TextBlock.Text>
+            <MultiBinding StringFormat="{}{0} files processed / {1} errors">
+                <Binding Path="Path" FallbackValue="0" />
+                <Binding Path="Error" FallbackValue="0" />
+            </MultiBinding>
+        </TextBlock.Text>
+    </TextBlock>
+</UserControl>
