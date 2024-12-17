@@ -18,7 +18,7 @@ public sealed class MediaFileViewModel : ViewModelBase
 
     public MediaFileViewModel(MediaFile mediaFile)
     {
-        _   mediaFile = mediaFile;
+        _mediaFile = mediaFile;
     }
     
     public MediaType Type => _mediaFile.Type;

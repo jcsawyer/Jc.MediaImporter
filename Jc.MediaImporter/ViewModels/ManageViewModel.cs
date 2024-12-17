@@ -37,6 +37,9 @@ public class ManageViewModel : ViewModelBase
     private ConcurrentDictionary<string, DirectoryData> folderIndex = new ConcurrentDictionary<string, DirectoryData>();
     private ConcurrentDictionary<string, FileData> fileIndex = new ConcurrentDictionary<string, FileData>();
 
+    private readonly ReadOnlyObservableCollection<MediaFileViewModel> _photos;
+    public ReadOnlyObservableCollection<MediaFileViewModel> Photos => _photos;
+    
     private bool _isPreparing = true;
     public bool IsPreparing
     {
