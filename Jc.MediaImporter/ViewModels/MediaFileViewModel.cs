@@ -1,4 +1,4 @@
-using System;
+    using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -18,7 +18,7 @@ public sealed class MediaFileViewModel : ViewModelBase
 
     public MediaFileViewModel(MediaFile mediaFile)
     {
-        _mediaFile = mediaFile;
+        _   mediaFile = mediaFile;
     }
     
     public MediaType Type => _mediaFile.Type;

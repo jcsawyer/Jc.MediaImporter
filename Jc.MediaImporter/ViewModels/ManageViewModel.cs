@@ -1,16 +1,21 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DynamicData;
 using DynamicData.Binding;
+using Jc.MediaImporter.Core;
 using Jc.MediaImporter.Helpers;
 using Jc.MediaImporter.Native;
 using MessagePack;
+using MetadataExtractor;
 using ReactiveUI;
+using Directory = System.IO.Directory;
 
 namespace Jc.MediaImporter.ViewModels;
 
@@ -67,6 +72,8 @@ public class ManageViewModel : ViewModelBase
         get => _indexedItems;
         set => this.RaiseAndSetIfChanged(ref _indexedItems, value);
     }
+    
+    private SourceCache<MediaFileViewModel, string> _mediaCache = new SourceCache<MediaFileViewModel, string>(x => x.Path);
     
     private ObservableCollection<MediaFileViewModel>? _media;
 
@@ -246,7 +253,53 @@ public class ManageViewModel : ViewModelBase
         
         Console.WriteLine("Finished in {0}ms", sw.ElapsedMilliseconds);
         IsIndexing = false;
+        
+        Load(cancellationToken);
     }
+
+    private void Load(CancellationToken cancellationToken)
+    {
+        var result = new ConcurrentBag<MediaFileViewModel>();
+        var errors = new ConcurrentBag<MediaFileErrorViewModel>();
+        
+        (string Path, IReadOnlyList<MetadataExtractor.Directory?> Directories)? GetMetaData(string path)
+        {
+            try
+            {
+                var directories = ImageMetadataReader.ReadMetadata(path);
+                return (path, directories);
+            }
+            catch (Exception ex)
+            {
+                if (path.Contains(".DS_Store", StringComparison.OrdinalIgnoreCase) || ex.Message.Equals("File format could not be determined", StringComparison.OrdinalIgnoreCase))
+                {
+                    return null;
+                }
+                errors.Add(new MediaFileErrorViewModel { Path = path, Error = ex.Message });
+                return null;
+            }
+        }
+        
+        Files.TraverseTreeParallelForEach(fileIndex.Keys.ToList(), file =>
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+            
+            var item = GetMetaData(file);
+            if (item is null)
+            {
+                return;
+            }
+            
+            var vm = new MediaFileViewModel(new MediaFile(item.Value.Path, item.Value.Directories));
+            Task.Run(() => vm.LoadThumbnailAsync(cancellationToken), cancellationToken);
+            result.Add(vm);
+        });
+        
+        Media = new ObservableCollection<MediaFileViewModel>(result.ToList());
+    }    
 
     [MessagePackObject]
     public record DirectoryData

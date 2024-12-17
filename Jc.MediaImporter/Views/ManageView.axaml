@@ -39,7 +39,15 @@
             </ui:CommandBar>
             <TabControl Margin="5" Height="500">
                 <TabItem Header="Summary">
-                    <TextBlock Text="Summary..."></TextBlock>
+                    <ListBox x:Name="Media"
+                             ItemsSource="{Binding Media}"
+                             Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
                 </TabItem>
                 <TabItem Header="Duplicates">
                     <TextBlock Text="Duplicates!"></TextBlock>
