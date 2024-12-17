@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using DynamicData.Binding;
@@ -68,6 +68,14 @@ public class ManageViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _indexedItems, value);
     }
     
+    private ObservableCollection<MediaFileViewModel>? _media;
+
+    public ObservableCollection<MediaFileViewModel>? Media
+    {
+        get => _media;
+        set => this.RaiseAndSetIfChanged(ref _media, value);
+    }
+    
     private void Prepare(string path)
     {
         _cancellationTokenSource?.Cancel();
@@ -102,11 +110,6 @@ public class ManageViewModel : ViewModelBase
             }
             
             var prePrepared = !folderIndex.IsEmpty || !fileIndex.IsEmpty;
-            if (prePrepared)
-            {
-                IsPreparing = false;
-                IsIndexing = true;
-            }
 
             Files.TraverseTreeParallelForEach(path, f =>
             {
@@ -162,6 +165,12 @@ public class ManageViewModel : ViewModelBase
                 Console.WriteLine($"Folder {deletedDir.Key} was deleted...");
                 folderIndex.TryRemove(deletedDir.Key, out _);
             }
+            
+            if (prePrepared)
+            {
+                IsPreparing = false;
+                IsIndexing = true;
+            }
         }
         catch (OperationCanceledException)
         {
@@ -203,7 +212,7 @@ public class ManageViewModel : ViewModelBase
                 cancellationToken.ThrowIfCancellationRequested();
                 
                 var size = OS.GetFileSize(f);
-                if (fileIndex.TryGetValue(f, out var file) && file.Size == size)
+                if (fileIndex.TryGetValue(f, out var file) && file.Size == size && !string.IsNullOrEmpty(file.Hash))
                 {
                     // Skip files that are already indexed and haven't changed size
                     fileIndex.TryUpdate(f, file with { IsIndexed = true }, file);
@@ -238,7 +247,7 @@ public class ManageViewModel : ViewModelBase
         Console.WriteLine("Finished in {0}ms", sw.ElapsedMilliseconds);
         IsIndexing = false;
     }
-    
+
     [MessagePackObject]
     public record DirectoryData
     {

@@ -7,19 +7,44 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.ManageView"
              x:DataType="vm:ManageViewModel">
-    <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <TextBlock HorizontalAlignment="Center" Text="{Binding LoadingState}">
-            <TextBlock.IsVisible>
-                <MultiBinding Converter="{x:Static BoolConverters.Or}">
-                    <Binding Path="IsPreparing"></Binding>
-                    <Binding Path="IsIndexing"></Binding>
+    <Panel>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock HorizontalAlignment="Center" Text="{Binding LoadingState}">
+                <TextBlock.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                        <Binding Path="IsPreparing"></Binding>
+                        <Binding Path="IsIndexing"></Binding>
+                    </MultiBinding>
+                </TextBlock.IsVisible>
+            </TextBlock>
+            <ProgressBar Background="{DynamicResource TextFillColorSecondary}"
+                         Foreground="{DynamicResource TextFillColorPrimary}" IsVisible="{Binding IsIndexing}"
+                         HorizontalAlignment="Stretch" Margin="10" Value="{Binding IndexedItems}"
+                         Maximum="{Binding TotalItems}">
+            </ProgressBar>
+            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" IsVisible="{Binding IsPreparing}" />
+        </StackPanel>
+        <StackPanel Height="500">
+            <StackPanel.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsPreparing" Converter="{x:Static BoolConverters.Not}"></Binding>
+                    <Binding Path="IsIndexing" Converter="{x:Static BoolConverters.Not}"></Binding>
                 </MultiBinding>
-            </TextBlock.IsVisible>
-        </TextBlock>
-        <ProgressBar Background="{DynamicResource TextFillColorSecondary}"
-                     Foreground="{DynamicResource TextFillColorPrimary}" IsVisible="{Binding IsIndexing}"
-                     HorizontalAlignment="Stretch" Margin="10" Value="{Binding IndexedItems}"
-                     Maximum="{Binding TotalItems}">
-        </ProgressBar>
-    </StackPanel>
+            </StackPanel.IsVisible>
+            <ui:CommandBar DefaultLabelPosition="Right">
+                <ui:CommandBar.PrimaryCommands>
+                    <ui:CommandBarToggleButton Label="(de)Select All" />
+                    <ui:CommandBarSeparator />
+                </ui:CommandBar.PrimaryCommands>
+            </ui:CommandBar>
+            <TabControl Margin="5" Height="500">
+                <TabItem Header="Summary">
+                    <TextBlock Text="Summary..."></TextBlock>
+                </TabItem>
+                <TabItem Header="Duplicates">
+                    <TextBlock Text="Duplicates!"></TextBlock>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </Panel>
 </UserControl>
