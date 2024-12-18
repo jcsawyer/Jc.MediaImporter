@@ -54,6 +54,13 @@ public class ManageViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isIndexing, value);
     }
     
+    private bool _isLoading = false;
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set => this.RaiseAndSetIfChanged(ref _isLoading, value);
+    }
+    
     private string _loadingState;
     public string LoadingState
     {
@@ -262,6 +269,7 @@ public class ManageViewModel : ViewModelBase
 
     private void Load(CancellationToken cancellationToken)
     {
+        IsLoading = true;
         var result = new ConcurrentBag<MediaFileViewModel>();
         var errors = new ConcurrentBag<MediaFileErrorViewModel>();
         
@@ -289,6 +297,8 @@ public class ManageViewModel : ViewModelBase
             {
                 return;
             }
+
+            LoadingState = $"Loading {file}";
             
             var item = GetMetaData(file);
             if (item is null)
@@ -300,6 +310,9 @@ public class ManageViewModel : ViewModelBase
             Task.Run(() => vm.LoadThumbnailAsync(cancellationToken), cancellationToken);
             result.Add(vm);
         });
+        
+        LoadingState = string.Empty;
+        IsLoading = false;
         
         Media = new ObservableCollection<MediaFileViewModel>(result.ToList());
     }    
