@@ -8,7 +8,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.ManageView"
              x:DataType="vm:ManageViewModel">
-    <Panel>
+    <Panel MaxWidth="800" MinHeight="500">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock HorizontalAlignment="Center" Text="{Binding LoadingState}">
                 <TextBlock.IsVisible>
@@ -53,33 +53,41 @@
                     </TextBlock>
                 </TabItem>
                 <TabItem Header="Duplicates">
-                    <ListBox ItemsSource="{Binding Media}" SelectionMode="Single">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type vm:MediaFileViewModel}">
-                                <StackPanel Spacing="5" Width="100" Margin="5" Orientation="Horizontal">
-                                    <Border CornerRadius="10" ClipToBounds="True">
-                                        <Panel>
-                                            <Image Width="75" Height="75" Stretch="Uniform" Source="{Binding Thumbnail}" />
-                                            <Panel Height="75" IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNull}}">
-                                                <PathIcon Height="50" Width="50" Data="{Binding Type, Converter={x:Static converters:TypeConverters.MediaTypeToIconKeyConverter}}" />
+                    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <ListBox x:Name="Duplicates" DockPanel.Dock="Left" Width="250" ItemsSource="{Binding Media}" SelectionMode="Single">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:MediaFileViewModel}">
+                                    <StackPanel Spacing="5" Margin="5" Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <Border CornerRadius="10" ClipToBounds="True">
+                                            <Panel>
+                                                <Image Width="75" Height="75" Stretch="Uniform"
+                                                       Source="{Binding Thumbnail}" />
+                                                <Panel Height="75"
+                                                       IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNull}}">
+                                                    <PathIcon Height="50" Width="50"
+                                                              Data="{Binding Type, Converter={x:Static converters:TypeConverters.MediaTypeToIconKeyConverter}}" />
+                                                </Panel>
                                             </Panel>
-                                        </Panel>
-                                    </Border>
-                                    <Panel>
-                                        <TextBlock Text="{Binding  Name}" HorizontalAlignment="Left" />
-                                        <TextBlock Text="{Binding SortedName}" HorizontalAlignment="Left" />
-                                    </Panel>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel>
-                                    <VirtualizingStackPanel></VirtualizingStackPanel>
-                                </VirtualizingStackPanel>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                    </ListBox>
+                                        </Border>
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{Binding  Name}" HorizontalAlignment="Left" />
+                                            <TextBlock Text="{Binding SortedName}" HorizontalAlignment="Left" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel>
+                                        <VirtualizingStackPanel></VirtualizingStackPanel>
+                                    </VirtualizingStackPanel>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+                        <StackPanel>
+                            <TextBlock Text="{Binding #Duplicates.SelectedItem}"></TextBlock>
+                        </StackPanel>
+                    </DockPanel>
                 </TabItem>
             </TabControl>
         </StackPanel>
