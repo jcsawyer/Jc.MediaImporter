@@ -21,7 +21,9 @@
                     </TextBlock>
                 </ui:CommandBarElementContainer>
                 <ui:CommandBarSeparator />
-                <ui:CommandBarToggleButton Label="(de)Select All" />
+                <ui:CommandBarToggleButton x:Name="SelectAll" Label="Select All"
+                                           IsCheckedChanged="SelectAll_OnIsCheckedChanged" IsChecked="False">
+                </ui:CommandBarToggleButton>
                 <ui:CommandBarSeparator />
             </ui:CommandBar.PrimaryCommands>
         </ui:CommandBar>
@@ -41,7 +43,9 @@
             <TabItem Header="Photos">
                 <ListBox x:Name="Photos"
                          ItemsSource="{Binding Photos}"
-                         Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle">
+                         Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle"
+                         SelectionChanged="Photos_OnSelectionChanged"
+                         DataContextChanged="Photos_OnDataContextChanged">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />
@@ -52,7 +56,9 @@
             <TabItem Header="Videos">
                 <ListBox x:Name="Videos"
                          ItemsSource="{Binding Videos}"
-                         Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle">
+                         Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle"
+                         SelectionChanged="Videos_OnSelectionChanged"
+                         DataContextChanged="Videos_OnDataContextChanged">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />
