@@ -25,6 +25,8 @@
                                            IsCheckedChanged="SelectAll_OnIsCheckedChanged" IsChecked="False">
                 </ui:CommandBarToggleButton>
                 <ui:CommandBarSeparator />
+                <ui:CommandBarButton Label="Delete" IconSource="Delete"></ui:CommandBarButton>
+                <ui:CommandBarButton Label="Import" IconSource="Import"></ui:CommandBarButton>
             </ui:CommandBar.PrimaryCommands>
         </ui:CommandBar>
         <TabControl Margin="5" Height="500">
