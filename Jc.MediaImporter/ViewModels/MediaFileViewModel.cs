@@ -1,7 +1,6 @@
-    using System;
+using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,14 +50,17 @@ public sealed class MediaFileViewModel : ViewModelBase
         }
         else if (Type is MediaType.Video)
         {
+            var guid = Guid.NewGuid();
+            var tempPath = System.IO.Path.Combine(Native.OS.DataDir, "temp", guid.ToString());
             try
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return;
                 }
-                await CreateThumbnailUsingFfmpeg(Path);
-                await using var stream = File.OpenRead(Path + ".jpg");
+
+                await CreateThumbnailUsingFfmpeg(Path, tempPath);
+                await using var stream = File.OpenRead(tempPath + ".jpg");
                 Thumbnail = await Task.Run(() => Bitmap.DecodeToWidth(stream, 100), cancellationToken);
             }
             catch
@@ -67,7 +69,7 @@ public sealed class MediaFileViewModel : ViewModelBase
             }
             finally
             {
-                File.Delete(Path + ".jpg");
+                File.Delete(tempPath + ".jpg");
             }
         }
         else
@@ -76,7 +78,7 @@ public sealed class MediaFileViewModel : ViewModelBase
         }
     }
 
-    static Task<long> CreateThumbnailUsingFfmpeg(string path)
+    static Task<long> CreateThumbnailUsingFfmpeg(string path, string tempPath)
     {
         var tcs = new TaskCompletionSource<long>();
         var process = new Process
@@ -84,7 +86,7 @@ public sealed class MediaFileViewModel : ViewModelBase
             StartInfo =
             {
                 FileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ffmpeg"),
-                Arguments = "-ss 5 -an -i \"" + path + "\" -vframes:v 1 -update true -y \"" + path + ".jpg\"",
+                Arguments = "-ss 5 -an -i \"" + path + "\" -vframes:v 1 -update true -y \"" + tempPath + ".jpg\"",
             },
             EnableRaisingEvents = true,
         };

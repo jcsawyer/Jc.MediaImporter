@@ -55,6 +55,9 @@ public static class OS
 
         if (!Directory.Exists(DataDir))
             Directory.CreateDirectory(DataDir);
+        
+        if (!Directory.Exists(Path.Combine(DataDir, "temp")))
+            Directory.CreateDirectory(Path.Combine(DataDir, "temp"));
     }
 
     public static long GetFileSize(string path)
