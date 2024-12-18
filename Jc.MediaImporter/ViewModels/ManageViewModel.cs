@@ -23,7 +23,7 @@ public class ManageViewModel : ViewModelBase
 {
     private static ManageViewModel? _instance;
     public static ManageViewModel Instance => _instance ??= new ManageViewModel();
-    
+
     private ManageViewModel()
     {
         var settings = SettingsViewModel.Instance;
@@ -39,8 +39,9 @@ public class ManageViewModel : ViewModelBase
 
     private readonly ReadOnlyObservableCollection<MediaFileViewModel> _photos;
     public ReadOnlyObservableCollection<MediaFileViewModel> Photos => _photos;
-    
+
     private bool _isPreparing = true;
+
     public bool IsPreparing
     {
         get => _isPreparing;
@@ -48,26 +49,29 @@ public class ManageViewModel : ViewModelBase
     }
 
     private bool _isIndexing = false;
+
     public bool IsIndexing
     {
         get => _isIndexing;
         set => this.RaiseAndSetIfChanged(ref _isIndexing, value);
     }
-    
+
     private bool _isLoading = false;
+
     public bool IsLoading
     {
         get => _isLoading;
         set => this.RaiseAndSetIfChanged(ref _isLoading, value);
     }
-    
+
     private string _loadingState;
+
     public string LoadingState
     {
         get => _loadingState;
         set => this.RaiseAndSetIfChanged(ref _loadingState, value);
     }
-    
+
     private int _totalItems;
 
     public int TotalItems
@@ -75,16 +79,18 @@ public class ManageViewModel : ViewModelBase
         get => _totalItems;
         set => this.RaiseAndSetIfChanged(ref _totalItems, value);
     }
-    
+
     private int _indexedItems;
+
     public int IndexedItems
     {
         get => _indexedItems;
         set => this.RaiseAndSetIfChanged(ref _indexedItems, value);
     }
-    
-    private SourceCache<MediaFileViewModel, string> _mediaCache = new SourceCache<MediaFileViewModel, string>(x => x.Path);
-    
+
+    private SourceCache<MediaFileViewModel, string> _mediaCache =
+        new SourceCache<MediaFileViewModel, string>(x => x.Path);
+
     private ObservableCollection<MediaFileViewModel>? _media;
 
     public ObservableCollection<MediaFileViewModel>? Media
@@ -92,7 +98,15 @@ public class ManageViewModel : ViewModelBase
         get => _media;
         set => this.RaiseAndSetIfChanged(ref _media, value);
     }
-    
+
+    private ObservableCollection<MediaFileViewModel>? _duplicates;
+
+    public ObservableCollection<MediaFileViewModel>? Duplicates
+    {
+        get => _duplicates;
+        set => this.RaiseAndSetIfChanged(ref _duplicates, value);
+    }
+
     private void Prepare(string path)
     {
         _cancellationTokenSource?.Cancel();
@@ -104,60 +118,70 @@ public class ManageViewModel : ViewModelBase
             // TODO show some kind of error
             return;
         }
-        
+
         IsPreparing = true;
         var itemCount = 0;
         LoadingState = $"Preparing to index {itemCount} items...";
-        
-        
+
+
         var sw = System.Diagnostics.Stopwatch.StartNew();
         try
         {
             Directory.CreateDirectory(Path.Combine(Native.OS.DataDir, "indexes", path.Replace('/', '_')));
             if (File.Exists(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "folders.index")))
             {
-                using var folderStream = File.OpenRead(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "folders.index"));
-                folderIndex = MessagePackSerializer.Deserialize<ConcurrentDictionary<string, DirectoryData>>(folderStream);
+                using var folderStream =
+                    File.OpenRead(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "folders.index"));
+                folderIndex =
+                    MessagePackSerializer.Deserialize<ConcurrentDictionary<string, DirectoryData>>(folderStream);
             }
-            
+
             if (File.Exists(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index")))
             {
-                using var fileStream = File.OpenRead(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index"));
+                using var fileStream =
+                    File.OpenRead(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index"));
                 fileIndex = MessagePackSerializer.Deserialize<ConcurrentDictionary<string, FileData>>(fileStream);
             }
-            
+
             var prePrepared = !folderIndex.IsEmpty || !fileIndex.IsEmpty;
 
             Files.TraverseTreeParallelForEach(path, f =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var childCount = Directory.EnumerateFileSystemEntries(f, "*.*", new EnumerationOptions { IgnoreInaccessible = true, ReturnSpecialDirectories = false, RecurseSubdirectories = false}).Count();
-                
+                var childCount = Directory.EnumerateFileSystemEntries(f, "*.*",
+                        new EnumerationOptions
+                        {
+                            IgnoreInaccessible = true, ReturnSpecialDirectories = false, RecurseSubdirectories = false
+                        })
+                    .Count();
+
                 LoadingState = $"Preparing to index {itemCount} items...";
-                
+
                 if (folderIndex.TryGetValue(f, out var dir))
                 {
-                    if (!folderIndex.TryUpdate(f, new DirectoryData { Path = f, ChildCount = childCount, IsIndexed = true }, dir))
+                    if (!folderIndex.TryUpdate(f,
+                            new DirectoryData { Path = f, ChildCount = childCount, IsIndexed = true }, dir))
                     {
                         throw new Exception("Failed to update folder index");
                     }
-                    
+
                     if (dir.ChildCount == childCount)
                     {
                         // It's fair to assume we can skip the files of a directory with the same number of files...
                         Console.WriteLine("Skipping files for {0}", f);
                         return (true, childCount);
                     }
-                    
+
                     // Don't skip the files if the number of files is different
                     Console.WriteLine("Processing files for {0}", f);
                     return (false, childCount);
                 }
-                
+
                 if (!folderIndex.TryAdd(f, new DirectoryData { Path = f, ChildCount = childCount, IsIndexed = true }))
                 {
                     throw new Exception("Failed to add to folder index");
                 }
+
                 // Don't skip the files if the directory doesn't exist in index 
                 Console.WriteLine("Processing files for {0}", f);
                 return (false, childCount);
@@ -175,14 +199,14 @@ public class ManageViewModel : ViewModelBase
 
                 LoadingState = $"Preparing to index {itemCount} items...";
             }, ref itemCount, ref itemCount);
-            
+
             foreach (var deletedDir in folderIndex.Where(f => !f.Value.IsIndexed))
             {
                 // Folder was deleted...
                 Console.WriteLine($"Folder {deletedDir.Key} was deleted...");
                 folderIndex.TryRemove(deletedDir.Key, out _);
             }
-            
+
             if (prePrepared)
             {
                 IsPreparing = false;
@@ -195,18 +219,20 @@ public class ManageViewModel : ViewModelBase
         }
         finally
         {
-            using var folderStream = File.OpenWrite(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "folders.index"));
+            using var folderStream =
+                File.OpenWrite(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "folders.index"));
             MessagePackSerializer.Serialize(folderStream, folderIndex);
-            
-            using var fileStream = File.OpenWrite(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index"));
+
+            using var fileStream =
+                File.OpenWrite(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index"));
             MessagePackSerializer.Serialize(fileStream, fileIndex);
         }
-        
+
         Console.WriteLine("Finished in {0}ms", sw.ElapsedMilliseconds);
-        
+
         IsPreparing = false;
         LoadingState = string.Empty;
-        
+
         IsIndexing = true;
         Index(path, itemCount, cancellationToken);
     }
@@ -214,7 +240,7 @@ public class ManageViewModel : ViewModelBase
     private void Index(string path, int total, CancellationToken cancellationToken)
     {
         TotalItems = total - folderIndex.Count + fileIndex.Count;
-        
+
         var sw = System.Diagnostics.Stopwatch.StartNew();
         var indexedItems = 0;
         try
@@ -227,7 +253,7 @@ public class ManageViewModel : ViewModelBase
             }, f =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 var size = OS.GetFileSize(f);
                 if (fileIndex.TryGetValue(f, out var file) && file.Size == size && !string.IsNullOrEmpty(file.Hash))
                 {
@@ -235,6 +261,7 @@ public class ManageViewModel : ViewModelBase
                     fileIndex.TryUpdate(f, file with { IsIndexed = true }, file);
                     return;
                 }
+
                 LoadingState = $"Indexing {f}";
 
                 var hash = Files.GetChecksum(f);
@@ -243,7 +270,7 @@ public class ManageViewModel : ViewModelBase
 
                 IndexedItems = indexedItems;
             }, ref indexedItems, ref indexedItems);
-            
+
             foreach (var deletedFile in fileIndex.Where(f => !f.Value.IsIndexed))
             {
                 // File was deleted...
@@ -257,13 +284,14 @@ public class ManageViewModel : ViewModelBase
         }
         finally
         {
-            using var fileStream = File.OpenWrite(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index"));
+            using var fileStream =
+                File.OpenWrite(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index"));
             MessagePackSerializer.Serialize(fileStream, fileIndex);
         }
-        
+
         Console.WriteLine("Finished in {0}ms", sw.ElapsedMilliseconds);
         IsIndexing = false;
-        
+
         Load(cancellationToken);
     }
 
@@ -272,7 +300,7 @@ public class ManageViewModel : ViewModelBase
         IsLoading = true;
         var result = new ConcurrentBag<MediaFileViewModel>();
         var errors = new ConcurrentBag<MediaFileErrorViewModel>();
-        
+
         (string Path, IReadOnlyList<MetadataExtractor.Directory?> Directories)? GetMetaData(string path)
         {
             try
@@ -282,15 +310,17 @@ public class ManageViewModel : ViewModelBase
             }
             catch (Exception ex)
             {
-                if (path.Contains(".DS_Store", StringComparison.OrdinalIgnoreCase) || ex.Message.Equals("File format could not be determined", StringComparison.OrdinalIgnoreCase))
+                if (path.Contains(".DS_Store", StringComparison.OrdinalIgnoreCase) ||
+                    ex.Message.Equals("File format could not be determined", StringComparison.OrdinalIgnoreCase))
                 {
                     return null;
                 }
+
                 errors.Add(new MediaFileErrorViewModel { Path = path, Error = ex.Message });
                 return null;
             }
         }
-        
+
         Files.TraverseTreeParallelForEach(fileIndex.Keys.ToList(), file =>
         {
             if (cancellationToken.IsCancellationRequested)
@@ -299,50 +329,47 @@ public class ManageViewModel : ViewModelBase
             }
 
             LoadingState = $"Loading {file}";
-            
+
             var item = GetMetaData(file);
             if (item is null)
             {
                 return;
             }
-            
+
             var vm = new MediaFileViewModel(new MediaFile(item.Value.Path, item.Value.Directories));
             Task.Run(() => vm.LoadThumbnailAsync(cancellationToken), cancellationToken);
             result.Add(vm);
         });
-        
+
         LoadingState = string.Empty;
         IsLoading = false;
-        
+
         Media = new ObservableCollection<MediaFileViewModel>(result.ToList());
-    }    
+
+        var dupes = fileIndex.GroupBy(x => x.Value.Hash).Where(x => x.Count() > 1).SelectMany(x => x)
+            .OrderBy(x => x.Value.Hash).ToDictionary();
+        Duplicates = new ObservableCollection<MediaFileViewModel>(Media.Where(x => dupes.ContainsKey(x.Path)));
+    }
 
     [MessagePackObject]
     public record DirectoryData
     {
-        [Key(0)]
-        public string Path { get; init; }
+        [Key(0)] public string Path { get; init; }
 
-        [Key(1)]
-        public int ChildCount { get; init; }
-        
-        [IgnoreMember]
-        public bool IsIndexed { get; set; }
+        [Key(1)] public int ChildCount { get; init; }
+
+        [IgnoreMember] public bool IsIndexed { get; set; }
     }
 
     [MessagePackObject]
     public record FileData
     {
-        [Key(0)]
-        public string Path { get; init; }
+        [Key(0)] public string Path { get; init; }
 
-        [Key(1)]
-        public long Size { get; init; }
+        [Key(1)] public long Size { get; init; }
 
-        [Key(2)]
-        public string Hash { get; init; }
-        
-        [IgnoreMember]
-        public bool IsIndexed { get; set; }
+        [Key(2)] public string Hash { get; init; }
+
+        [IgnoreMember] public bool IsIndexed { get; set; }
     }
 }

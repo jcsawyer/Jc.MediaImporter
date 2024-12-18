@@ -16,6 +16,9 @@ public partial class App : Application
 
         var settings = SettingsViewModel.Instance;
         settings.PropertyChanged += (_, _) => settings.Save();
+        
+        // Just instantiate the view model to make sure it's loaded
+        _ = ManageViewModel.Instance;
     }
 
     public override void OnFrameworkInitializationCompleted()
