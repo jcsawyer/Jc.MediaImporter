@@ -136,8 +136,11 @@ public class LoadImportViewModel : ViewModelBase
             {
                 return;
             }
-            
+
             var vm = new MediaFileViewModel(new MediaFile(item.Value.Path, item.Value.Directories));
+            var hash = Files.GetChecksum(vm.Path);
+            vm.IsDuplicate = ManageViewModel.Instance.FileIndex.Any(x => x.Value.Hash == hash || x.Value.Path.Equals(Path.Combine(SettingsViewModel.Instance.DefaultPhotosDirectory, vm.SortedName + vm.Extension), StringComparison.OrdinalIgnoreCase) || x.Value.Path.Equals(Path.Combine(SettingsViewModel.Instance.DefaultVideosDirectory, vm.SortedName + vm.Extension), StringComparison.OrdinalIgnoreCase));
+
             Task.Run(() => vm.LoadThumbnailAsync(cancellationToken), cancellationToken);
             result.Add(vm);
         });

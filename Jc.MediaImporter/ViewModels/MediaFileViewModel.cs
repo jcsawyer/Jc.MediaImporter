@@ -35,12 +35,19 @@ public sealed class MediaFileViewModel : ViewModelBase
     private Bitmap? _thumbnail =
         new Bitmap(AssetLoader.Open(new Uri("avares://Jc.MediaImporter/Assets/Placeholder Image.png")));
     public Bitmap? Thumbnail
-
     {
         get => _thumbnail;
         private set => this.RaiseAndSetIfChanged(ref _thumbnail, value);
     }
 
+    private bool _isDuplicate;
+
+    public bool IsDuplicate
+    {
+        get => _isDuplicate;
+        set => this.RaiseAndSetIfChanged(ref _isDuplicate, value);
+    }
+    
     public async Task LoadThumbnailAsync(CancellationToken cancellationToken)
     {
         if (Type is MediaType.Photo)

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
              xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:views="clr-namespace:Jc.MediaImporter.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.Import.ConfigureImportView"
              x:DataType="vm:Import.ConfigureImportViewModel">
@@ -45,7 +46,7 @@
             <TabItem Header="Photos">
                 <ListBox x:Name="Photos"
                          ItemsSource="{Binding Photos}"
-                         Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle"
+                         Background="Transparent" Margin="0 20 0 0" SelectionMode="Multiple, Toggle"
                          SelectionChanged="Photos_OnSelectionChanged"
                          DataContextChanged="Photos_OnDataContextChanged">
                     <ListBox.ItemsPanel>
@@ -58,9 +59,16 @@
             <TabItem Header="Videos">
                 <ListBox x:Name="Videos"
                          ItemsSource="{Binding Videos}"
-                         Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle"
-                         SelectionChanged="Videos_OnSelectionChanged"
+                         Background="Transparent" Margin="0 20 0 0" SelectionMode="Multiple, Toggle"
+                         SelectionChanged="Videos_OnSelectionChanged" 
                          DataContextChanged="Videos_OnDataContextChanged">
+                    <ListBox.ItemContainerTheme>
+                        <ControlTheme
+                            TargetType="ListBoxItem"
+                            x:DataType="vm:MediaFileViewModel">
+                            <Setter Property="Background" Value="#22C42B1C"></Setter>
+                        </ControlTheme>
+                    </ListBox.ItemContainerTheme>
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />
@@ -71,7 +79,7 @@
             <TabItem Header="Failed" IsVisible="{Binding ErrorMedia.Count, FallbackValue=0}">
                 <ListBox x:Name="ErrorMedia"
                          ItemsSource="{Binding ErrorMedia}"
-                         Background="Transparent" Margin="0 20" SelectionMode="Multiple, Toggle">
+                         Background="Transparent" Margin="0 20 0 0" SelectionMode="Multiple, Toggle">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />

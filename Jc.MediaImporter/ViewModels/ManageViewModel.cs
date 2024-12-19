@@ -34,8 +34,8 @@ public class ManageViewModel : ViewModelBase
     }
 
     private CancellationTokenSource _cancellationTokenSource;
-    private ConcurrentDictionary<string, DirectoryData> folderIndex = new ConcurrentDictionary<string, DirectoryData>();
-    private ConcurrentDictionary<string, FileData> fileIndex = new ConcurrentDictionary<string, FileData>();
+    public ConcurrentDictionary<string, DirectoryData> FolderIndex = new ConcurrentDictionary<string, DirectoryData>();
+    public ConcurrentDictionary<string, FileData> FileIndex = new ConcurrentDictionary<string, FileData>();
 
     private readonly ReadOnlyObservableCollection<MediaFileViewModel> _photos;
     public ReadOnlyObservableCollection<MediaFileViewModel> Photos => _photos;
@@ -132,7 +132,7 @@ public class ManageViewModel : ViewModelBase
             {
                 using var folderStream =
                     File.OpenRead(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "folders.index"));
-                folderIndex =
+                FolderIndex =
                     MessagePackSerializer.Deserialize<ConcurrentDictionary<string, DirectoryData>>(folderStream);
             }
 
@@ -140,10 +140,10 @@ public class ManageViewModel : ViewModelBase
             {
                 using var fileStream =
                     File.OpenRead(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index"));
-                fileIndex = MessagePackSerializer.Deserialize<ConcurrentDictionary<string, FileData>>(fileStream);
+                FileIndex = MessagePackSerializer.Deserialize<ConcurrentDictionary<string, FileData>>(fileStream);
             }
 
-            var prePrepared = !folderIndex.IsEmpty || !fileIndex.IsEmpty;
+            var prePrepared = !FolderIndex.IsEmpty || !FileIndex.IsEmpty;
 
             Files.TraverseTreeParallelForEach(path, f =>
             {
@@ -157,9 +157,9 @@ public class ManageViewModel : ViewModelBase
 
                 LoadingState = $"Preparing to index {itemCount} items...";
 
-                if (folderIndex.TryGetValue(f, out var dir))
+                if (FolderIndex.TryGetValue(f, out var dir))
                 {
-                    if (!folderIndex.TryUpdate(f,
+                    if (!FolderIndex.TryUpdate(f,
                             new DirectoryData { Path = f, ChildCount = childCount, IsIndexed = true }, dir))
                     {
                         throw new Exception("Failed to update folder index");
@@ -177,7 +177,7 @@ public class ManageViewModel : ViewModelBase
                     return (false, childCount);
                 }
 
-                if (!folderIndex.TryAdd(f, new DirectoryData { Path = f, ChildCount = childCount, IsIndexed = true }))
+                if (!FolderIndex.TryAdd(f, new DirectoryData { Path = f, ChildCount = childCount, IsIndexed = true }))
                 {
                     throw new Exception("Failed to add to folder index");
                 }
@@ -191,7 +191,7 @@ public class ManageViewModel : ViewModelBase
 
                 var size = OS.GetFileSize(f);
 
-                if (!fileIndex.TryAdd(f, new FileData { Path = f, Size = size }))
+                if (!FileIndex.TryAdd(f, new FileData { Path = f, Size = size }))
                 {
                     // TODO : Need to do something here for files that already exist.
                     Console.WriteLine("Skipping file {0}", f);
@@ -200,11 +200,11 @@ public class ManageViewModel : ViewModelBase
                 LoadingState = $"Preparing to index {itemCount} items...";
             }, ref itemCount, ref itemCount);
 
-            foreach (var deletedDir in folderIndex.Where(f => !f.Value.IsIndexed))
+            foreach (var deletedDir in FolderIndex.Where(f => !f.Value.IsIndexed))
             {
                 // Folder was deleted...
                 Console.WriteLine($"Folder {deletedDir.Key} was deleted...");
-                folderIndex.TryRemove(deletedDir.Key, out _);
+                FolderIndex.TryRemove(deletedDir.Key, out _);
             }
 
             if (prePrepared)
@@ -221,11 +221,11 @@ public class ManageViewModel : ViewModelBase
         {
             using var folderStream =
                 File.OpenWrite(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "folders.index"));
-            MessagePackSerializer.Serialize(folderStream, folderIndex);
+            MessagePackSerializer.Serialize(folderStream, FolderIndex);
 
             using var fileStream =
                 File.OpenWrite(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index"));
-            MessagePackSerializer.Serialize(fileStream, fileIndex);
+            MessagePackSerializer.Serialize(fileStream, FileIndex);
         }
 
         Console.WriteLine("Finished in {0}ms", sw.ElapsedMilliseconds);
@@ -239,7 +239,7 @@ public class ManageViewModel : ViewModelBase
 
     private void Index(string path, int total, CancellationToken cancellationToken)
     {
-        TotalItems = total - folderIndex.Count + fileIndex.Count;
+        TotalItems = total - FolderIndex.Count + FileIndex.Count;
 
         var sw = System.Diagnostics.Stopwatch.StartNew();
         var indexedItems = 0;
@@ -255,27 +255,27 @@ public class ManageViewModel : ViewModelBase
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var size = OS.GetFileSize(f);
-                if (fileIndex.TryGetValue(f, out var file) && file.Size == size && !string.IsNullOrEmpty(file.Hash))
+                if (FileIndex.TryGetValue(f, out var file) && file.Size == size && !string.IsNullOrEmpty(file.Hash))
                 {
                     // Skip files that are already indexed and haven't changed size
-                    fileIndex.TryUpdate(f, file with { IsIndexed = true }, file);
+                    FileIndex.TryUpdate(f, file with { IsIndexed = true }, file);
                     return;
                 }
 
                 LoadingState = $"Indexing {f}";
 
                 var hash = Files.GetChecksum(f);
-                fileIndex.AddOrUpdate(f, f => new FileData { Size = size, Hash = hash, IsIndexed = true, Path = f },
+                FileIndex.AddOrUpdate(f, f => new FileData { Size = size, Hash = hash, IsIndexed = true, Path = f },
                     (_, d) => d with { Hash = hash, IsIndexed = true });
 
                 IndexedItems = indexedItems;
             }, ref indexedItems, ref indexedItems);
 
-            foreach (var deletedFile in fileIndex.Where(f => !f.Value.IsIndexed))
+            foreach (var deletedFile in FileIndex.Where(f => !f.Value.IsIndexed))
             {
                 // File was deleted...
                 Console.WriteLine($"File {deletedFile.Key} was deleted...");
-                fileIndex.TryRemove(deletedFile.Key, out _);
+                FileIndex.TryRemove(deletedFile.Key, out _);
             }
         }
         catch (OperationCanceledException)
@@ -286,7 +286,7 @@ public class ManageViewModel : ViewModelBase
         {
             using var fileStream =
                 File.OpenWrite(Path.Combine(OS.DataDir, "indexes", path.Replace('/', '_'), "files.index"));
-            MessagePackSerializer.Serialize(fileStream, fileIndex);
+            MessagePackSerializer.Serialize(fileStream, FileIndex);
         }
 
         Console.WriteLine("Finished in {0}ms", sw.ElapsedMilliseconds);
@@ -321,7 +321,7 @@ public class ManageViewModel : ViewModelBase
             }
         }
 
-        Files.TraverseTreeParallelForEach(fileIndex.Keys.ToList(), file =>
+        Files.TraverseTreeParallelForEach(FileIndex.Keys.ToList(), file =>
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -346,7 +346,7 @@ public class ManageViewModel : ViewModelBase
 
         Media = new ObservableCollection<MediaFileViewModel>(result.ToList());
 
-        var dupes = fileIndex.GroupBy(x => x.Value.Hash).Where(x => x.Count() > 1).SelectMany(x => x)
+        var dupes = FileIndex.GroupBy(x => x.Value.Hash).Where(x => x.Count() > 1).SelectMany(x => x)
             .OrderBy(x => x.Value.Hash).ToDictionary();
         Duplicates = new ObservableCollection<MediaFileViewModel>(Media.Where(x => dupes.ContainsKey(x.Path)));
     }

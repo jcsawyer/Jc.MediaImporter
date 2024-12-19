@@ -4,19 +4,25 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
              xmlns:converters="clr-namespace:Jc.MediaImporter.Converters"
+             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Jc.MediaImporter.Views.MediaFileView"
              x:DataType="vm:MediaFileViewModel">
-    <StackPanel Spacing="5" Width="100" Margin="5">
+    <StackPanel Spacing="5" Width="100" Margin="5" Classes.duplicate="{Binding IsDuplicate}">
         <Border CornerRadius="10" ClipToBounds="True">
             <Panel>
-                <Image Width="100" Height="100" Stretch="Uniform" Source="{Binding Thumbnail}" />
+                <Grid ColumnDefinitions="*" RowDefinitions="*">
+                    <Panel Grid.Column="0" Grid.Row="0"  ToolTip.Tip="Duplicate" HorizontalAlignment="Left" VerticalAlignment="Top" IsVisible="{Binding IsDuplicate}">
+                        <ui:InfoBadge Classes="Caution Icon" />
+                    </Panel>
+                    <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Stretch="Uniform" Source="{Binding Thumbnail}" />
+                </Grid>
                 <Panel Height="100" IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNull}}">
                     <PathIcon Height="75" Width="75" Data="{Binding Type, Converter={x:Static converters:TypeConverters.MediaTypeToIconKeyConverter}}" />
                 </Panel>
             </Panel>
         </Border>
-        <TextBlock Text="{Binding  Name}" HorizontalAlignment="Left" />
-        <TextBlock Text="{Binding SortedName}" HorizontalAlignment="Left" />
+        <TextBlock Text="{Binding  Name}" HorizontalAlignment="Left" ToolTip.Tip="{Binding Path}" />
+        <TextBlock Text="{Binding SortedName}" HorizontalAlignment="Left" ToolTip.Tip="{Binding SortedName}" />
     </StackPanel>
 </UserControl>
