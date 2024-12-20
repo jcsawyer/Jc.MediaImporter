@@ -21,7 +21,7 @@ namespace Jc.MediaImporter.ViewModels.Import;
 public class LoadImportViewModel : ViewModelBase
 {
     private readonly ImportViewModel _import;
-    
+
     public LoadImportViewModel(ImportViewModel import)
     {
         _import = import ?? throw new ArgumentNullException(nameof(import));
@@ -29,12 +29,12 @@ public class LoadImportViewModel : ViewModelBase
         ConfigureImportCommand = ReactiveCommand.Create(ConfigureImport);
         Task.Run(() => LoadMedia(SettingsViewModel.Instance.DefaultSourceDirectory));
     }
-    
+
     public ICommand StopImportCommand { get; }
     public ICommand ConfigureImportCommand { get; }
 
     private CancellationTokenSource? _cancellationTokenSource;
-    
+
     private ObservableCollection<MediaFileViewModel>? _media;
 
     public ObservableCollection<MediaFileViewModel>? Media
@@ -44,12 +44,13 @@ public class LoadImportViewModel : ViewModelBase
     }
 
     private ObservableCollection<MediaFileErrorViewModel>? _errorMedia;
+
     public ObservableCollection<MediaFileErrorViewModel>? ErrorMedia
     {
         get => _errorMedia;
         set => this.RaiseAndSetIfChanged(ref _errorMedia, value);
     }
-    
+
     private bool _isLoading = true;
 
     public bool IsLoading
@@ -67,12 +68,13 @@ public class LoadImportViewModel : ViewModelBase
     }
 
     private string _currentFile;
+
     public string CurrentFile
     {
         get => _currentFile;
         set => this.RaiseAndSetIfChanged(ref _currentFile, value);
     }
-    
+
     private void StopImport()
     {
         Dispatcher.UIThread.Post(() =>
@@ -95,16 +97,16 @@ public class LoadImportViewModel : ViewModelBase
         _cancellationTokenSource?.Cancel();
         _cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = _cancellationTokenSource.Token;
-        
+
         if (!Directory.Exists(sourceDirectory))
         {
             IsLoading = false;
             Error = "Invalid source directory, please check your settings and try again.";
         }
-        
+
         var result = new ConcurrentBag<MediaFileViewModel>();
         var errors = new ConcurrentBag<MediaFileErrorViewModel>();
-        
+
         (string Path, IReadOnlyList<MetadataExtractor.Directory?> Directories)? GetMetaData(string path)
         {
             try
@@ -114,10 +116,12 @@ public class LoadImportViewModel : ViewModelBase
             }
             catch (Exception ex)
             {
-                if (path.Contains(".DS_Store", StringComparison.OrdinalIgnoreCase) || ex.Message.Equals("File format could not be determined", StringComparison.OrdinalIgnoreCase))
+                if (path.Contains(".DS_Store", StringComparison.OrdinalIgnoreCase) ||
+                    ex.Message.Equals("File format could not be determined", StringComparison.OrdinalIgnoreCase))
                 {
                     return null;
                 }
+
                 errors.Add(new MediaFileErrorViewModel { Path = path, Error = ex.Message });
                 return null;
             }
@@ -130,7 +134,7 @@ public class LoadImportViewModel : ViewModelBase
             {
                 return;
             }
-            
+
             var item = GetMetaData(file);
             if (item is null)
             {
@@ -139,7 +143,15 @@ public class LoadImportViewModel : ViewModelBase
 
             var vm = new MediaFileViewModel(new MediaFile(item.Value.Path, item.Value.Directories));
             var hash = Files.GetChecksum(vm.Path);
-            vm.IsDuplicate = ManageViewModel.Instance.FileIndex.Any(x => x.Value.Hash == hash || x.Value.Path.Equals(Path.Combine(SettingsViewModel.Instance.DefaultPhotosDirectory, vm.SortedName + vm.Extension), StringComparison.OrdinalIgnoreCase) || x.Value.Path.Equals(Path.Combine(SettingsViewModel.Instance.DefaultVideosDirectory, vm.SortedName + vm.Extension), StringComparison.OrdinalIgnoreCase));
+            vm.IsDuplicate = ManageViewModel.Instance.FileIndex.Any(x =>
+                x.Value.Hash == hash ||
+                x.Value.Path.Equals(
+                    Path.Combine(SettingsViewModel.Instance.DefaultPhotosDirectory,
+                        $"{vm.Date.Year}-{vm.Date.Month:00}", vm.SortedName + vm.Extension),
+                    StringComparison.OrdinalIgnoreCase) || x.Value.Path.Equals(
+                    Path.Combine(SettingsViewModel.Instance.DefaultVideosDirectory,
+                        $"{vm.Date.Year}-{vm.Date.Month:00}", vm.SortedName + vm.Extension),
+                    StringComparison.OrdinalIgnoreCase));
 
             Task.Run(() => vm.LoadThumbnailAsync(cancellationToken), cancellationToken);
             result.Add(vm);
