@@ -54,10 +54,14 @@
                 </TabItem>
                 <TabItem Header="Duplicates">
                     <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                        <ListBox x:Name="Duplicates" DockPanel.Dock="Left" Width="250" ItemsSource="{Binding Duplicates}" SelectionMode="Single">
+                        <ListBox x:Name="Duplicates" DockPanel.Dock="Left" Width="250"
+                                 ItemsSource="{Binding Duplicates}" SelectionMode="Single"
+                                 VerticalAlignment="Top"
+                                 Height="330">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:MediaFileViewModel}">
-                                    <StackPanel Spacing="5" Margin="5" Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <StackPanel Spacing="5" Margin="5" Orientation="Horizontal"
+                                                HorizontalAlignment="Left">
                                         <Border CornerRadius="10" ClipToBounds="True">
                                             <Panel>
                                                 <Image Width="75" Height="75" Stretch="Uniform"

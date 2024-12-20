@@ -12,10 +12,10 @@
         <Border CornerRadius="10" ClipToBounds="True">
             <Panel>
                 <Grid ColumnDefinitions="*" RowDefinitions="*">
+                    <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Stretch="Uniform" Source="{Binding Thumbnail}" />
                     <Panel Grid.Column="0" Grid.Row="0"  ToolTip.Tip="Duplicate" HorizontalAlignment="Left" VerticalAlignment="Top" IsVisible="{Binding IsDuplicate}">
                         <ui:InfoBadge Classes="Caution Icon" />
                     </Panel>
-                    <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Stretch="Uniform" Source="{Binding Thumbnail}" />
                 </Grid>
                 <Panel Height="100" IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNull}}">
                     <PathIcon Height="75" Width="75" Data="{Binding Type, Converter={x:Static converters:TypeConverters.MediaTypeToIconKeyConverter}}" />
