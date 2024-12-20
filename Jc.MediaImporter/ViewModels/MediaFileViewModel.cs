@@ -13,27 +13,30 @@ namespace Jc.MediaImporter.ViewModels;
 
 public sealed class MediaFileViewModel : ViewModelBase
 {
+    private static Bitmap DefaultThumbnail =
+        new Bitmap(AssetLoader.Open(new Uri("avares://Jc.MediaImporter/Assets/Placeholder Image.png")));
+
     private readonly MediaFile _mediaFile;
 
     public MediaFileViewModel(MediaFile mediaFile)
     {
         _mediaFile = mediaFile;
     }
-    
+
     public MediaType Type => _mediaFile.Type;
 
     public string Path => _mediaFile.Path;
-    
+
     public string Name => _mediaFile.Name;
 
     public string Extension => _mediaFile.Extension;
-    
+
     public string SortedName => _mediaFile.SortedName;
-    
+
     public DateTime Date => _mediaFile.Date;
 
-    private Bitmap? _thumbnail =
-        new Bitmap(AssetLoader.Open(new Uri("avares://Jc.MediaImporter/Assets/Placeholder Image.png")));
+    private Bitmap? _thumbnail = DefaultThumbnail;
+
     public Bitmap? Thumbnail
     {
         get => _thumbnail;
@@ -47,7 +50,7 @@ public sealed class MediaFileViewModel : ViewModelBase
         get => _isDuplicate;
         set => this.RaiseAndSetIfChanged(ref _isDuplicate, value);
     }
-    
+
     public async Task LoadThumbnailAsync(CancellationToken cancellationToken)
     {
         if (Type is MediaType.Photo)
@@ -72,7 +75,8 @@ public sealed class MediaFileViewModel : ViewModelBase
             }
             catch
             {
-                Thumbnail = new Bitmap(AssetLoader.Open(new Uri("avares://Jc.MediaImporter/Assets/Placeholder Image.png")));
+                Thumbnail = new Bitmap(
+                    AssetLoader.Open(new Uri("avares://Jc.MediaImporter/Assets/Placeholder Image.png")));
             }
             finally
             {
@@ -92,7 +96,8 @@ public sealed class MediaFileViewModel : ViewModelBase
         {
             StartInfo =
             {
-                FileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "ffmpeg"),
+                FileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+                    "ffmpeg"),
                 Arguments = "-ss 5 -an -i \"" + path + "\" -vframes:v 1 -update true -y \"" + tempPath + ".jpg\"",
             },
             EnableRaisingEvents = true,
