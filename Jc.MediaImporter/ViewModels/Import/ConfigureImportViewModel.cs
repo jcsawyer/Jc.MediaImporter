@@ -1,13 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
+using System.Windows.Input;
+using Avalonia.Threading;
 using DynamicData;
 using Jc.MediaImporter.Core;
-using Jc.MediaImporter.Helpers;
 using ReactiveUI;
 
 namespace Jc.MediaImporter.ViewModels.Import;
@@ -21,6 +19,8 @@ public class ConfigureImportViewModel : ViewModelBase
         _import = import ?? throw new ArgumentNullException(nameof(import));
         Media = media;
         ErrorMedia = errorMedia;
+
+        ImportCommand = ReactiveCommand.Create(Import);
 
         foreach (var file in Media)
         {
@@ -41,6 +41,8 @@ public class ConfigureImportViewModel : ViewModelBase
         //Task.Run(() => IdentifyDuplicates());
         //ManageViewModel.Instance.Media.CollectionChanged += (_, _) => Task.Run(() => IdentifyDuplicates());
     }
+    
+    public ICommand ImportCommand { get; }
     
     private SourceCache<MediaFileViewModel, string> _mediaCache = new SourceCache<MediaFileViewModel, string>(x => x.Path);
     
@@ -64,18 +66,22 @@ public class ConfigureImportViewModel : ViewModelBase
     private readonly ReadOnlyObservableCollection<MediaFileViewModel> _videos;
     public ReadOnlyObservableCollection<MediaFileViewModel> Videos => _videos;
 
-    /*private void IdentifyDuplicates()
+    private List<MediaFileViewModel> _selectedPhotos = new List<MediaFileViewModel>();
+    public List<MediaFileViewModel> SelectedPhotos
     {
-        foreach (var photo in Photos)
-        {
-            var hash = Files.GetChecksum(photo.Path);
-            // A photo is deemed a duplicate if it has the same hash as another photo or if it has the same sorted name as another photo
-            photo.IsDuplicate = ManageViewModel.Instance.FileIndex.Any(x => x.Value.Hash == hash || x.Value.Path.Equals(Path.Combine(Path.GetDirectoryName(photo.Path), photo.SortedName + photo.Extension), StringComparison.OrdinalIgnoreCase));
-        }
+        get => _selectedPhotos;
+        set => this.RaiseAndSetIfChanged(ref _selectedPhotos, value);
     }
-
-    private static string GetTargetPath(string path, string sortedName, string extension)
+    
+    private List<MediaFileViewModel> _selectedVideos = new List<MediaFileViewModel>();
+    public List<MediaFileViewModel> SelectedVideos
     {
-        return ;
-    }*/
+        get => _selectedVideos;
+        set => this.RaiseAndSetIfChanged(ref _selectedVideos, value);
+    }
+    
+    private void Import()
+    {
+        Dispatcher.UIThread.Post(() => _import.ImportCommand.Execute((SelectedPhotos, SelectedVideos)));
+    }
 }

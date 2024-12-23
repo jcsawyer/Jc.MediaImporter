@@ -26,7 +26,7 @@
                 </ui:CommandBarToggleButton>
                 <ui:CommandBarSeparator />
                 <ui:CommandBarButton Label="Delete" IconSource="Delete"></ui:CommandBarButton>
-                <ui:CommandBarButton Label="Import" IconSource="Import"></ui:CommandBarButton>
+                <ui:CommandBarButton Label="Import" IconSource="Import" Command="{Binding ImportCommand}"></ui:CommandBarButton>
             </ui:CommandBar.PrimaryCommands>
         </ui:CommandBar>
         <TabControl Margin="5" Height="500">
@@ -46,6 +46,7 @@
                 <ListBox x:Name="Photos"
                          ItemsSource="{Binding Photos}"
                          Background="Transparent" Margin="0 20 0 0" SelectionMode="Multiple, Toggle"
+                         SelectedItems="{Binding SelectedPhotos, Mode=TwoWay}"
                          SelectionChanged="Photos_OnSelectionChanged"
                          DataContextChanged="Photos_OnDataContextChanged"
                          VerticalAlignment="Top"
@@ -68,6 +69,7 @@
                 <ListBox x:Name="Videos"
                          ItemsSource="{Binding Videos}"
                          Background="Transparent" Margin="0 20 0 0" SelectionMode="Multiple, Toggle"
+                         SelectedItems="{Binding SelectedVideos, Mode=TwoWay}"
                          SelectionChanged="Videos_OnSelectionChanged" 
                          DataContextChanged="Videos_OnDataContextChanged"
                          VerticalAlignment="Top"
