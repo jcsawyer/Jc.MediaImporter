@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using Jc.MediaImporter.ViewModels.Import;
 using ReactiveUI;
@@ -51,6 +53,23 @@ public class ImportViewModel : ViewModelBase
 
     private void Import((List<MediaFileViewModel> Photos, List<MediaFileViewModel> Videos) media)
     {
+        void seedDirectories(string root, IEnumerable<IGrouping<string, MediaFileViewModel>> groupedFiles)
+        {
+            foreach (var group in groupedFiles)
+            {
+                Directory.CreateDirectory(Path.Combine(root, group.Key));
+            }
+        }
+        
+        var groupedPhotos = media.Photos.GroupBy(x => $"{x.Date.Year}-{x.Date.Month:00}");
+        seedDirectories(Path.Combine(SettingsViewModel.Instance.DefaultPhotosDirectory), groupedPhotos);
+        var groupedVideos = media.Videos.GroupBy(x => $"{x.Date.Year}-{x.Date.Month:00}");
+        seedDirectories(Path.Combine(SettingsViewModel.Instance.DefaultPhotosDirectory), groupedVideos);
+        
+        var groupedMedia = media.Photos.Concat(media.Videos).GroupBy(x => $"{x.Date.Year}-{x.Date.Month:00}");
+
+        var totalItems = groupedMedia.Sum(x => x.Count());
+
         // TODO set current page to importing view
     }
 }
