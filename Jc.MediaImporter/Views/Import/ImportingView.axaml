@@ -2,7 +2,53 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Jc.MediaImporter.ViewModels"
+             xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Jc.MediaImporter.Views.Import.ImportingView">
-    Welcome to Avalonia!
+             x:Class="Jc.MediaImporter.Views.Import.ImportingView"
+             x:DataType="vm:Import.ImportingViewModel">
+    <DockPanel HorizontalAlignment="Center">
+        <Panel DockPanel.Dock="Bottom">
+            <Button Content="Cancel" HorizontalAlignment="Center" Command="">
+                <Button.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                        <Binding Path="IsSeedingDirectories"></Binding>
+                        <Binding Path="IsImporting"></Binding>
+                        <!--<Binding Path="Error" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"></Binding>-->
+                    </MultiBinding>
+                </Button.IsVisible>
+            </Button>
+        </Panel>
+        <StackPanel VerticalAlignment="Center">
+            <StackPanel.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsImporting" Converter="{x:Static BoolConverters.Not}"></Binding>
+                    <Binding Path="IsSeedingDirectories" Converter="{x:Static BoolConverters.Not}"></Binding>
+                </MultiBinding>
+            </StackPanel.IsVisible>
+            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center" />
+        </StackPanel>
+        <StackPanel VerticalAlignment="Center">
+            <StackPanel.IsVisible>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="IsImporting" Converter="{x:Static BoolConverters.Not}"></Binding>
+                    <Binding Path="IsSeedingDirectories"></Binding>
+                </MultiBinding>
+            </StackPanel.IsVisible>
+            <TextBlock Text="Seeding directories"></TextBlock>
+            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center" />
+        </StackPanel>
+        <StackPanel IsVisible="{Binding IsImporting}"
+                    VerticalAlignment="Center">
+            <TextBlock Text="{Binding CompletedFiles, FallbackValue=null, StringFormat='{}{0} files imported'}"
+                       HorizontalAlignment="Center">
+            </TextBlock>
+            <TextBlock Text="{Binding CurrentFile.SortedName, FallbackValue=null, StringFormat='Importing {0}'}"
+                       HorizontalAlignment="Center">
+            </TextBlock>
+            <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" Stretch="Uniform"
+                   Source="{Binding CurrentFile.Thumbnail}" />
+            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center" />
+        </StackPanel>
+    </DockPanel>
 </UserControl>

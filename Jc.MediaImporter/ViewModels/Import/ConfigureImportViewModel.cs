@@ -82,6 +82,10 @@ public class ConfigureImportViewModel : ViewModelBase
     
     private void Import()
     {
+        if (SelectedPhotos.Count == 0 && SelectedVideos.Count == 0)
+        {
+            return;
+        }
         Dispatcher.UIThread.Post(() => _import.ImportCommand.Execute((SelectedPhotos, SelectedVideos)));
     }
 }
