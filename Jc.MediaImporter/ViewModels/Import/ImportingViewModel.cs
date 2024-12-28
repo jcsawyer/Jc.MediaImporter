@@ -1,6 +1,6 @@
 namespace Jc.MediaImporter.ViewModels.Import;
 
-public class ImportingViewModel
+public class ImportingViewModel : ViewModelBase
 {
     
 }
