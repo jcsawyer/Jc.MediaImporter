@@ -42,3 +42,5 @@ This was just thrown together to get it up and running now I'm on a Mac, but I w
 - Better duplicate handling in the import process
 - Delete duplicates from the source directory
 - Manage process to enable complete management of duplicates
+- Implement import cancellation
+- Reduce memory consumption

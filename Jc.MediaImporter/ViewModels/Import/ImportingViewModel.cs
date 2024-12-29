@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Avalonia.Threading;
 using Jc.MediaImporter.Core;
 using ReactiveUI;
@@ -20,7 +21,22 @@ public class ImportingViewModel : ViewModelBase
     private readonly IReadOnlyList<MediaFileViewModel> _videos;
     public IReadOnlyList<MediaFileViewModel> Videos => _videos;
 
-    private bool _isSeedingDirectories;
+    public ImportingViewModel(ImportViewModel import, List<MediaFileViewModel> photos, List<MediaFileViewModel> videos)
+    {
+        _import = import ?? throw new ArgumentNullException(nameof(import));
+        _photos = photos;
+        _videos = videos;
+
+        _totalFiles = _photos.Count + _videos.Count;
+
+        RestartCommand = ReactiveCommand.Create(Restart);
+
+        Task.Run(Import);
+    }
+    
+    public ICommand RestartCommand { get; }
+    
+    private bool _isSeedingDirectories = true;
     public bool IsSeedingDirectories
     {
         get => _isSeedingDirectories;
@@ -57,17 +73,6 @@ public class ImportingViewModel : ViewModelBase
     {
         get => _completedFiles;
         set => this.RaiseAndSetIfChanged(ref _completedFiles, value);
-    }
-
-    public ImportingViewModel(ImportViewModel import, List<MediaFileViewModel> photos, List<MediaFileViewModel> videos)
-    {
-        _import = import ?? throw new ArgumentNullException(nameof(import));
-        _photos = photos;
-        _videos = videos;
-
-        _totalFiles = _photos.Count + _videos.Count;
-
-        Task.Run(Import);
     }
 
     private void Import()
@@ -147,5 +152,10 @@ public class ImportingViewModel : ViewModelBase
         }
 
         Dispatcher.UIThread.Post(() => IsImporting = false);
+    }
+
+    private void Restart()
+    {
+        Dispatcher.UIThread.Post(() => _import.StopImportCommand.Execute(null));
     }
 }

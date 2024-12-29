@@ -9,7 +9,8 @@
              x:DataType="vm:Import.ImportingViewModel">
     <DockPanel HorizontalAlignment="Center">
         <Panel DockPanel.Dock="Bottom">
-            <Button Content="Cancel" HorizontalAlignment="Center" Command="">
+            <!-- TOODO : implement import cancellation -->
+            <Button Content="Cancel" HorizontalAlignment="Center" Command="{Binding }">
                 <Button.IsVisible>
                     <MultiBinding Converter="{x:Static BoolConverters.Or}">
                         <Binding Path="IsSeedingDirectories"></Binding>
@@ -26,7 +27,7 @@
                     <Binding Path="IsSeedingDirectories" Converter="{x:Static BoolConverters.Not}"></Binding>
                 </MultiBinding>
             </StackPanel.IsVisible>
-            <ui:ProgressRing Width="100" Height="100" Foreground="#aaffffff" HorizontalAlignment="Center" />
+            <Button Width="100" Height="100" CornerRadius="50" HorizontalAlignment="Center" Margin="10" Content="Restart" Command="{Binding RestartCommand}"></Button>
         </StackPanel>
         <StackPanel VerticalAlignment="Center">
             <StackPanel.IsVisible>
