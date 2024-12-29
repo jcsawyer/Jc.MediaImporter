@@ -11,6 +11,7 @@ using DynamicData;
 using DynamicData.Binding;
 using Jc.MediaImporter.Core;
 using Jc.MediaImporter.Helpers;
+using Jc.MediaImporter.Models;
 using Jc.MediaImporter.Native;
 using MessagePack;
 using MetadataExtractor;
@@ -99,9 +100,9 @@ public class ManageViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _media, value);
     }
 
-    private ObservableCollection<MediaFileViewModel>? _duplicates;
+    private SortedObservableCollection<MediaFileViewModel>? _duplicates;
 
-    public ObservableCollection<MediaFileViewModel>? Duplicates
+    public SortedObservableCollection<MediaFileViewModel>? Duplicates
     {
         get => _duplicates;
         set => this.RaiseAndSetIfChanged(ref _duplicates, value);
@@ -347,8 +348,13 @@ public class ManageViewModel : ViewModelBase
         Media = new ObservableCollection<MediaFileViewModel>(result.ToList());
 
         var dupes = FileIndex.GroupBy(x => x.Value.Hash).Where(x => x.Count() > 1).SelectMany(x => x)
-            .OrderBy(x => x.Value.Hash).ToDictionary();
-        Duplicates = new ObservableCollection<MediaFileViewModel>(Media.Where(x => dupes.ContainsKey(x.Path)));
+            .ToDictionary();
+        Duplicates = new SortedObservableCollection<MediaFileViewModel>(new List<MediaFileViewModel>())
+        {
+            SortingSelector = x => x.SortedName,
+            Descending = true,
+        };
+        Duplicates.AddRange(Media.Where(x => dupes.ContainsKey(x.Path)));
     }
 
     [MessagePackObject]
