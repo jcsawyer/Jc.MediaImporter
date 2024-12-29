@@ -136,7 +136,7 @@ public class ImportingViewModel : ViewModelBase
                 {
                     var dir = Path.GetDirectoryName(file.Path);
                     if (Directory.EnumerateFiles(dir!, "*.*", SearchOption.AllDirectories)
-                        .All(x => x.EndsWith("Thumbs.db", StringComparison.OrdinalIgnoreCase)))
+                        .All(x => x.EndsWith("Thumbs.db", StringComparison.OrdinalIgnoreCase) || x.EndsWith(".DS_Store", StringComparison.OrdinalIgnoreCase)))
                     {
                         Directory.Delete(dir, true);
                     }
