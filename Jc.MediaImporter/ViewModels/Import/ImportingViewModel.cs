@@ -90,7 +90,7 @@ public class ImportingViewModel : ViewModelBase
         var groupedPhotos = _photos.GroupBy(x => $"{x.Date.Year}-{x.Date.Month:00}");
         seedDirectories(Path.Combine(SettingsViewModel.Instance.DefaultPhotosDirectory), groupedPhotos);
         var groupedVideos = _videos.GroupBy(x => $"{x.Date.Year}-{x.Date.Month:00}");
-        seedDirectories(Path.Combine(SettingsViewModel.Instance.DefaultPhotosDirectory), groupedVideos);
+        seedDirectories(Path.Combine(SettingsViewModel.Instance.DefaultVideosDirectory), groupedVideos);
 
         var groupedMedia = _photos.Concat(_videos).GroupBy(x => $"{x.Date.Year}-{x.Date.Month:00}");
         Dispatcher.UIThread.Post(() => IsSeedingDirectories = false);
@@ -119,7 +119,7 @@ public class ImportingViewModel : ViewModelBase
                 {
                     File.Move(file.Path, Path.Combine(destination, group.Key, $"{file.SortedName}{file.Extension}"));
                 }
-                catch (IOException eex) when (eex.Message == "Cannot create a file when that file already exists.")
+                catch (IOException eex) when (eex.Message == "Cannot create a file when that file already exists." || eex.Message == $"The file '{Path.Combine(destination, group.Key, $"{file.SortedName}{file.Extension}")}' already exists.")
                 {
                     var duplicates = Directory.GetFiles(Path.Combine(destination, group.Key), $"{file.SortedName}*");
                     try
